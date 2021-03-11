@@ -2,6 +2,7 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
+  path("test", testfunc, name="test"),
   # ログイン認証
   path("siteUser/login", SiteUserLoginView.as_view(), name="site_user_login"),
   path("siteUser/logout", SiteUserLogoutView.as_view(), name="site_user_logout"),
@@ -12,8 +13,12 @@ urlpatterns = [
   # youtube検索
   path("youtube_search/", youtube_searchfunc, name='youtube_search'),
   path("", youtube_searchfunc, name='youtube_search'),
-  # マイリスト
+  # マイリスト(カテゴリ一覧)
   path("mylist/", mylistView.as_view(), name="mylist"),
-  # マイリスト削除
+  # マイリスト(カテゴリ別)
+  path("mylist_category/<str:pk>", mylist_categoryfunc, name="mylist_category"),
+  # マイリスト追加
+  path("mylist_add", addMylistFunc, name="mylist_add"),
+  # # マイリスト削除
   path("mylist_delete/", deleteMylistView.as_view(), name="mylist_delete"),
 ]

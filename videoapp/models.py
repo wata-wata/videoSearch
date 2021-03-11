@@ -3,30 +3,61 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils.translation import gettext_lazy as _
 
-# 保存する動画の情報
-class Video(models.Model):
-    title = models.CharField(max_length=100)
-    url = models.CharField(max_length=300)
-    thumbnail = models.CharField(max_length=300)
-    # レシピを保存するユーザーの情報
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,)
+# 動画のカテゴリ
+class VideoCategory(models.Model):
+    name = models.CharField(max_length=100)
+    # カテゴリを保存するユーザーの情報
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:
         constraints = [
             # ユニーク制約
             models.UniqueConstraint(
-                fields=("url", "user"),
-                name="myvideo_unique"
+                fields=("name", "user"),
+                name="videocategory_unique"
             )
         ]
-
+    
+    # 使わない...?
     @classmethod
-    def check_myvideo_unique(cls, url, user) -> bool:
+    def check_videocategory_unique(cls, name, user) -> bool:
         """同じデータががすでにDBに登録されているどうかを判定します
 
         登録されていたらTrue, されていなかったらFalseを返します。
         """
-        return cls.objects.filter(url=url, user=user).exists()
+        return cls.objects.filter(name=name, user=user).exists()
+
+    # クラスオブジェクトを文字列で返すメソッド
+    def __str__(self):
+        return self.name
+
+# 保存する動画の情報
+class Video(models.Model):
+    title = models.CharField(max_length=100)
+    url = models.CharField(max_length=300)
+    thumbnail = models.CharField(max_length=300)
+    # 動画を保存するユーザーの情報
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    # 動画のカテゴリ
+    category = models.ForeignKey(VideoCategory, on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            # ユニーク制約
+            models.UniqueConstraint(
+                fields=("url", "user", "category"),
+                name="myvideo_unique"
+            )
+        ]
+
+    # 使ってない...?
+    @classmethod
+    def check_myvideo_unique(cls, url, user, category) -> bool:
+        """同じデータががすでにDBに登録されているどうかを判定します
+
+        登録されていたらTrue, されていなかったらFalseを返します。
+        """
+        return cls.objects.filter(url=url, user=user, category=category).exists()
 
     # クラスオブジェクトを文字列で返すメソッド
     def __str__(self):

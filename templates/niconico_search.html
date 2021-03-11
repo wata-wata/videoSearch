@@ -25,26 +25,19 @@
   <!-- 新規タブで開く -->
   <a href="{{ i.url }}" target="_blank" rel="noopener noreferrer">
     {{ i.title }}<br>
-    <img src="{{ i.thumbnail }}" /><br>
+    <img src="{{ i.thumbnail }}" />
   </a>
   <p>再生回数:{{ i.viewCounter }}回</p>
-{% endfor %}
-</div>
-
-<div id="select_video"> <!-- 最初は非表示、マイリストに追加するときは表示 -->
-  <p>マイリストに追加する動画を選択</p>
+  <!-- 追加画面に遷移する -->
   <form method="POST">
     {% csrf_token %}
-    <!-- 検索結果 -->
-    {% for i in result %}
-      <!-- チェックボックス -->
-      <input class="recipe-btn" type="checkbox" name="video" id="{{ i.url }}" value="{{ i }}">
-      {{ i.title }}<br>
-      <img src="{{ i.thumbnail }}" /><br>
-    {% endfor %}
-    <br>
-    <input class="btn btn-outline-success" type="submit" value="マイリストに追加">
+    <!-- データを追加画面に渡す -->
+    <input type="hidden" name="title" value="{{ i.title }}" />
+    <input type="hidden" name="url" value="{{ i.url }}" />
+    <input type="hidden" name="thumbnail" value="{{ i.thumbnail }}" />
+    <button type="submit">マイリストに追加</button><br>
   </form>
+{% endfor %}
 </div>
 
 <p class="btn btn-link" onclick="clickBtn1()">選択</p>

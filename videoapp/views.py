@@ -1,3 +1,4 @@
+from videoapp.models import VideoCategory
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, QueryDict
 import requests
@@ -19,6 +20,9 @@ from oauth2client.tools import argparser
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
+def testfunc(request):
+  return render(request, 'youtube_search.html')
+
 # youtube --------------------------------------------------------------------------
 @login_required
 def youtube_searchfunc(request):
@@ -27,7 +31,8 @@ def youtube_searchfunc(request):
     # print(request.POST)
     # print(request.POST.getlist('video', False))
     is_exist_word = request.POST.get('word', False)
-    if is_exist_word != False: # 検索キーワードを受け取って検索する
+    if is_exist_word != False: # 「検索」ボタンが押されたとき
+      # 検索キーワードを受け取って検索する
       # print(request.POST['word'])
       # keyに対応するvalueがあるかどうかでformのPOST処理を分ける
       form = SearchForm(request.POST)
@@ -40,7 +45,6 @@ def youtube_searchfunc(request):
           developerKey=DEVELOPER_KEY)
 
       search_response = youtube.search().list(
-          # q="ポケモン", # 検索キーワード
           q=word, # 検索キーワード
           part="id,snippet",
           maxResults=25,
@@ -52,13 +56,14 @@ def youtube_searchfunc(request):
 
       i = 0
       for search_result in search_response.get("items", []):
-          # if i == 0:
-          #   print(i)
-            # print(search_result)
-            # print(search_result["snippet"]["publishedAt"]) # 投稿日時
-            # print(search_result["snippet"]["description"]) # 概要欄の文章
-            # print(search_result["snippet"]["thumbnails"]["default"]["url"]) # サムネイルの画像のURL
-            
+          if i < 2: # テスト
+            print(search_result)
+            # print(search_result["snippet"]["channelTitle"]) # チャンネル名
+            # print(search_result["id"]["videoId"]) # id
+            # idから再生回数を取得する
+            # id = search_result["id"]["videoId"]
+            # statistics = youtube.videos().list(part = 'statistics', id = id).execute()['items'][0]['statistics']
+            # print(statistics)
           i += 1
           if search_result["id"]["kind"] == "youtube#video":
             videos.append("%s (%s)" % (search_result["snippet"]["title"],
@@ -73,6 +78,12 @@ def youtube_searchfunc(request):
             # params['result'].append("https://www.youtube.com/watch?v=" + search_result["id"]["videoId"])
             # サムネイルの画像のURL
             d['thumbnail'] = search_result["snippet"]["thumbnails"]["default"]["url"]
+            # チャンネル名
+            d['channelTitle'] = search_result["snippet"]["channelTitle"]
+            # idから再生回数を取得する
+            id = search_result["id"]["videoId"]
+            viewCount = youtube.videos().list(part = 'statistics', id = id).execute()['items'][0]['statistics']
+            d['viewCount'] = viewCount["viewCount"]
 
             params['result'].append(d)
 
@@ -83,46 +94,22 @@ def youtube_searchfunc(request):
             playlists.append("%s (%s)" % (search_result["snippet"]["title"],
                                           search_result["id"]["playlistId"]))
 
-    else:
-      # (マイリストに追加する処理)
-      is_exist_video = request.POST.getlist('video', False)
-      if is_exist_video != False: # 1つ以上選択されたとき
-        # 選択した動画をマイリストに追加する
-        for v in is_exist_video:
-          r = ast.literal_eval(v) # 文字列から辞書に変換する
-          print(r)
-          print(type(r))
-          print(r['title'])
-          
-          qd = QueryDict(
-            'title='+r["title"]+
-            '&url='+r["url"]+
-            '&thumbnail='+r["thumbnail"]
-          )
-          print(qd)
-
-          form = MyVideo(user=request.user, data=qd)
-          print(type(request.user))
-          # insert処理(Videoモデルに追加する)
-          if form.is_valid():
-            create_myvideo = Video(
-              title=qd['title'],
-              url=qd['url'],
-              thumbnail=qd['thumbnail'],
-              user=request.user
-            )
-            create_myvideo.save()
-            messages.success(request, r["title"]+'をマイリストに保存しました')
-          else:
-            messages.error(request, r["title"]+"は既に保存されています")
-
-      else:
-        messages.error(request, "動画を1つ以上選択してください")
+    # 「マイリストに追加」ボタンが押されたとき、mylist_add.htmlに遷移する
+    elif request.POST.get('title', False) != False:
+      # print(request.POST.get('title', False))
+      d = {}
+      d['title'] = request.POST['title']
+      d['url'] = request.POST['url']
+      d['thumbnail'] = request.POST['thumbnail']
+      # d['categories'] = VideoCategory.objects.all # カテゴリ一覧
+      d['categories'] = VideoCategory.objects.filter(user=request.user).distinct()
+      return render(request, 'mylist_add.html', d)
 
     params['form'] = SearchForm()
 
-  else: # 最初に関数が呼ばれたとき
+  else: # request.method == 'GET'(最初に関数が呼ばれたとき)
     params['form'] = SearchForm()
+
   return render(request, 'youtube_search.html', params)
 
 # niconico --------------------------------------------------------------------------
@@ -183,40 +170,16 @@ def niconico_searchfunc(request):
         d['url'] = "https://nico.ms/" + responses['data'][i]['contentId']
         params['result'].append(d)
 
-    else:
-      # マイリストに追加する処理
-      is_exist_video = request.POST.getlist('video', False)
-      if is_exist_video != False: # 1つ以上選択されたとき
-        # 選択した動画をマイリストに追加する
-        for v in is_exist_video:
-          r = ast.literal_eval(v) # 文字列から辞書に変換する
-          print(r)
-          print(type(r))
-          print(r['title'])
-
-          qd = QueryDict(
-            'title='+r["title"]+
-            '&url='+r["url"]+
-            '&thumbnail='+r["thumbnail"]
-          )
-          print(qd)
-
-          form = MyVideo(user=request.user, data=qd)
-          print(type(request.user))
-          # insert処理(Videoモデルに追加する)
-          if form.is_valid():
-            create_myvideo = Video(
-              title=qd['title'],
-              url=qd['url'],
-              thumbnail=qd['thumbnail'],
-              user=request.user
-            )
-            create_myvideo.save()
-            messages.success(request, r["title"]+'をマイリストに保存しました')
-          else:
-            messages.error(request, r["title"]+"は既に保存されています")
-      else:
-        messages.error(request, "動画を1つ以上選択してください")
+    # 「マイリストに追加」ボタンが押されたとき、mylist_add.htmlに遷移する
+    elif request.POST.get('title', False) != False:
+      print(request.POST.get('title', False))
+      d = {}
+      d['title'] = request.POST['title']
+      d['url'] = request.POST['url']
+      d['thumbnail'] = request.POST['thumbnail']
+      # d['categories'] = VideoCategory.objects.all # カテゴリ一覧
+      d['categories'] = VideoCategory.objects.filter(user=request.user).distinct()
+      return render(request, 'mylist_add.html', d)
 
     params['form'] = SearchForm()
   
@@ -224,13 +187,178 @@ def niconico_searchfunc(request):
     params['form'] = SearchForm()
   return render(request, 'niconico_search.html', params)
 
-# マイリスト
+# マイリスト(カテゴリ一覧)
 class mylistView(View, LoginRequiredMixin):
   def get(self, request, *args, **kwargs): # 最初に読み込まれたとき
+    # カテゴリを全て取得する
+    categories = []
+    for i in VideoCategory.objects.filter(user=request.user).distinct().values("name"):
+      print(i["name"])
+      print(type(i["name"]))
+      categories.append(i["name"])
+    print(categories)
     context = {
-      "mylist": Video.objects.filter(user=request.user).order_by("-id")
+      "mylist": Video.objects.filter(user=request.user).order_by("-id"),
+      # カテゴリをVideoモデルから、user名指定→カテゴリ重複しないように取ってきたい
+      "categories": categories
     }
     return render(request, "mylist.html", context)
+
+  def post(self, request, *args, **kwargs): # カテゴリを追加したとき
+    print(request.POST)
+    print(request.POST["category_add"])
+    category_add = request.POST["category_add"] # 追加するカテゴリ
+    
+    if category_add != "":
+      form = VideoCategoryReservationForm({
+        "name":category_add,
+        "user":request.user
+      })
+
+      if form.is_valid() == True:
+        # モデル「VideoCategory」に追加する
+        vc = VideoCategory(
+          name=category_add,
+          user=request.user
+        )
+        vc.save() # VideoCategoryモデルに追加する
+        messages.success(request,"カテゴリ「" + category_add + "」が追加されました")
+      else: # 同じデータが既にあるとき
+          messages.error(request, category_add + "は既に存在します")
+    else:
+      # カテゴリが入力されなかったとき
+      messages.error(request,"追加するカテゴリを入力してください")
+
+    # カテゴリを全て取得する
+    categories = []
+    for i in VideoCategory.objects.filter(user=request.user).distinct().values("name"):
+      print(i["name"])
+      print(type(i["name"]))
+      categories.append(i["name"])
+    print(categories)
+    context = {
+      "mylist": Video.objects.filter(user=request.user).order_by("-id"),
+      # カテゴリをVideoモデルから、user名指定→カテゴリ重複しないように取ってきたい
+      "categories": categories
+    }
+
+    return render(request, "mylist.html", context)
+
+# マイリスト(カテゴリ別)
+@login_required
+def mylist_categoryfunc(request, pk):
+  # pk: 選択したカテゴリの名前
+
+  print(pk)
+  print(type(pk))
+
+  if request.method == "POST":
+    # 選択した動画を削除する
+    category_name = request.POST.get("category_name")
+    print(category_name)
+    print(type(category_name))
+
+    video_list = request.POST.getlist("check_delete")
+    print(video_list) # 選択しなかったら[]になる
+
+    # 動画が1つ以上選択されたとき
+    if video_list != []:
+      for i in video_list:
+        print(i)
+        # string → dict
+        i = ast.literal_eval(i)
+        print(i["title"])
+
+        # Videoモデルから削除する
+        v = Video.objects.filter(user=request.user).filter(category__name=category_name).filter(title=i["title"])
+        v.delete()
+        messages.success(request, i["title"] + "をカテゴリ「" + category_name + "」から削除しました")
+
+    # 1つも選択されなかったとき
+    else:
+      messages.error(request,"動画を1つ以上選択してください")
+
+  # 選択したカテゴリの動画のタイトルを取得する
+  # category__name: VideoCategoryモデルのname
+  video = Video.objects.filter(user=request.user).filter(category__name=pk)
+
+  print(video)
+
+  # titles = []
+  video_info = []
+  for i in video:
+    d = {}
+    # タイトル
+    title = str(i)
+    # titles.append(title)
+    d["title"] = title
+    
+    v = Video.objects.filter(user=request.user).filter(category__name=pk).filter(title=title)
+    # URL
+    print(v[0].url)
+    d["url"] = v[0].url
+    # サムネイル
+    print(v[0].thumbnail)
+    d["thumbnail"] = v[0].thumbnail
+
+    video_info.append(d)
+
+  params = {
+    "pk":pk,
+    "video_info":video_info
+  }
+
+  return render(request, "mylist_category.html", params)
+
+# マイリスト追加
+@login_required
+def addMylistFunc(request):
+  # print("called addMylistFunc")
+  if request.method == 'POST':
+    # 動画を、選択されたカテゴリのマイリストに追加する
+    # print(request.POST)
+
+    # print(request.POST['title']) # 動画のタイトル
+    # print(request.POST['url']) # 動画のURL
+    # print(request.POST['thumbnail']) # 動画のサムネイル
+    # print(request.user) # ログインしているユーザー
+
+    category_checked = False # カテゴリが1つ以上選択されていればTrue
+
+    for key in request.POST:
+      if(request.POST[key]=='on'):
+        category_checked = True
+
+        print(request.POST['url'])
+        print(VideoCategory.objects.filter(name=key)[0].name)
+
+        # 重複しているデータがあるか判定する
+        form = VideoReservationForm({
+          'url':request.POST['url'],
+          'user':request.user,
+          'category':VideoCategory.objects.filter(name=key)[0]
+        })
+
+        print(form.is_valid()) # Trueならモデルに追加する
+
+        if form.is_valid() == True:
+          # モデル「Video」に追加する ---------------
+          v = Video(
+            title=request.POST['title'],
+            url=request.POST['url'],
+            thumbnail=request.POST['thumbnail'],
+            user=request.user,
+            category=VideoCategory.objects.filter(name=key)[0]
+          )
+          v.save() # 「Video」モデルに追加する
+          messages.success(request, request.POST['title'] + "をマイリスト(" + key + ")に追加しました")
+        else: # 同じデータが既にあるとき
+          messages.error(request, request.POST['title'] + "は既にマイリスト(" + key + ")に保存されています")
+
+    if category_checked == False: # カテゴリが1つも選択されていないとき
+      messages.error(request,"最低1つ以上選択してください")
+
+  return render(request, "mylist_add.html")
 
 # マイリスト削除
 class deleteMylistView(View, LoginRequiredMixin):

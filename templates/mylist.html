@@ -4,27 +4,24 @@
 
 <h1>マイリスト</h1>
 <div id="mylist">
-    {% for i in mylist %}
-    <!-- <button class="mylist-btn" onclick="location.href='{{ i.url }}'"> -->
-    <!-- 新規タブで開く -->
-    <a href="{{ i.url }}" target="_blank" rel="noopener noreferrer">
-        <article class="article-mylist">
-            <figure>
-                <img src="{{ i.thumbnail }}" />
-            </figure>
-            <h5>{{ i.title }}</h5>
-        </article>
-    </a>
-    {% endfor %}
+  <p>カテゴリ一覧</p>
+  {% for category in categories %}
+    {{ category }}
+    <a href="{% url 'mylist_category' category %}">カテゴリに移動</a><br>
+  {% endfor %}
+
+  <form method="POST">
+    {% csrf_token %}
+    <input type="text" placeholder="カテゴリを追加" name="category_add">
+    <button type="submit">追加</button>
+  </form>
 </div>
 
 <!-- 動画を選択して削除する -->
-<div id="select_mylist_delete">
-    <!-- formが送信されたら'mylist_delete'に遷移する -->
+<!-- <div id="select_mylist_delete">
     <form action="{% url 'mylist_delete' %}" method="post">
         {% csrf_token %}
         {% for i in mylist %}
-            <!-- チェックボックス -->
             <input class="recipe-btn" type="checkbox" name="video" id="{{ i.url }}" value="{{ i }}">
             {{ i.title }}<br>
             <img src="{{ i.thumbnail }}" /><br>
@@ -35,6 +32,6 @@
 </div>
 
 <p class="btn btn-link" id="select" onclick="clickBtn3()">選択</p>
-<p class="btn btn-link" id="select" onclick="clickBtn4()">戻す</p>
+<p class="btn btn-link" id="back" onclick="clickBtn4()">戻す</p> -->
 
 {% endblock %}

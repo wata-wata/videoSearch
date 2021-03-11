@@ -1,5 +1,5 @@
 from django import forms
-from .models import SiteUser, Video
+from .models import SiteUser, Video, VideoCategory
 import re
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -8,11 +8,13 @@ class SearchForm(forms.Form):
   word = forms.CharField(label='キーワード', max_length=100)
 
 # マイリストへの動画の追加に使う
+# VideoReservationForm使っててこっちは使ってない...?
 class MyVideo(forms.ModelForm):
     class Meta:
         model = Video
         # 使用するフィールド
-        fields = ('title', 'url', 'thumbnail')
+        # fields = ('title', 'url', 'thumbnail')
+        fields = ('url', 'category')
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -24,9 +26,22 @@ class MyVideo(forms.ModelForm):
         cleaned_data = super(MyVideo, self).clean()
         url = self.cleaned_data.get("url")
         user = self.user
+        category = self.cleaned_data.get("category")
 
-        if Video.check_myvideo_unique(url, user):
+        if Video.check_myvideo_unique(url, user, category):
             raise forms.ValidationError("")
+
+# VideoCategoryのデータの重複を防ぐ
+class VideoCategoryReservationForm(forms.ModelForm):
+    class Meta:
+        model = VideoCategory
+        fields = ["name", "user"]
+
+# Videoのデータの重複を防ぐ
+class VideoReservationForm(forms.ModelForm):
+    class Meta:
+        model = Video
+        fields = ["url", "user", "category"]
 
 # ログイン認証
 class SiteUserRegisterForm(forms.ModelForm):
