@@ -14,10 +14,10 @@
 <h1>youtube検索</h1>
 
 <div id="search"> <!-- 最初は表示、マイリストに追加するときは非表示 -->
-<form method="POST">
+<form method="POST" id="search_form">
   {% csrf_token %}
   {{ form }}
-  <button type="submit">検索</button>
+  <button type="submit" class="search_button">検索</button>
 </form>
 
 <!-- 検索結果 -->
@@ -27,10 +27,9 @@
     {{ i.title }}<br>
     <img src="{{ i.thumbnail }}" />
   </a>
-  <p>{{ i.channelTitle }}</p>
+  <!-- <p>{{ i.channelTitle }}</p> -->
   <p>再生回数:{{ i.viewCount }}回</p>
   <!-- 追加画面に遷移する -->
-  <!-- actionを設定して別のviewに渡した方がいいかも? -->
   <form method="POST">
     {% csrf_token %}
     <!-- データを追加画面に渡す -->

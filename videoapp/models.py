@@ -39,7 +39,7 @@ class Video(models.Model):
     # 動画を保存するユーザーの情報
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     # 動画のカテゴリ
-    category = models.ForeignKey(VideoCategory, on_delete=models.CASCADE)
+    category = models.ForeignKey("VideoCategory", on_delete=models.CASCADE)
 
     class Meta:
         constraints = [

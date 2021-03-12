@@ -17,8 +17,6 @@ urlpatterns = [
   path("mylist/", mylistView.as_view(), name="mylist"),
   # マイリスト(カテゴリ別)
   path("mylist_category/<str:pk>", mylist_categoryfunc, name="mylist_category"),
-  # マイリスト追加
+  # マイリスト(動画追加)
   path("mylist_add", addMylistFunc, name="mylist_add"),
-  # # マイリスト削除
-  path("mylist_delete/", deleteMylistView.as_view(), name="mylist_delete"),
 ]

@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 # youtube,niconico検索
 class SearchForm(forms.Form):
-  word = forms.CharField(label='キーワード', max_length=100)
+  word = forms.CharField(label="キーワード", max_length=100)
 
 # マイリストへの動画の追加に使う
 # VideoReservationForm使っててこっちは使ってない...?

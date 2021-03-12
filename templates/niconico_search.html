@@ -14,10 +14,10 @@
 <h1>niconico検索</h1>
 
 <div id="search"> <!-- 最初は表示、マイリストに追加するときは非表示 -->
-<form method="POST">
+<form method="POST" class="search_form">
   {% csrf_token %}
   {{ form }}
-  <button type="submit">検索</button>
+  <button type="submit" class="search_button">検索</button>
 </form>
 
 <!-- 検索結果 -->
@@ -40,6 +40,4 @@
 {% endfor %}
 </div>
 
-<p class="btn btn-link" onclick="clickBtn1()">選択</p>
-<p class="btn btn-link" onclick="clickBtn2()">戻す</p>
 {% endblock content %}

@@ -4,8 +4,8 @@
 
 <p>カテゴリ : {{ pk }}</p>
 <a href="{% url 'mylist' %}">カテゴリ一覧に戻る</a><br>
-<button onclick="clickBtn3()">編集</button>
-<button onclick="clickBtn4()">戻る</button>
+<button id="edit_button" onclick="edit()">編集</button>
+<button id="back_button" onclick="back()">戻る</button>
 
 <!-- 動画を表示する -->
 <div id="mylist">
@@ -24,7 +24,7 @@
     {% for i in video_info %}
       <p>
         <!-- チェックボックス -->
-        <input class="recipe-btn" type="checkbox" name="check_delete" id="{{ i.recipeId }}" value="{{ i }}">
+        <input type="checkbox" name="check_delete" id="{{ i.recipeId }}" value="{{ i }}">
         {{ i.title }}<br>
         <img src="{{ i.thumbnail }}" /><br>
       </p>

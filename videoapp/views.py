@@ -1,4 +1,4 @@
-from videoapp.models import VideoCategory
+from videoapp.models import *
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, QueryDict
 import requests
@@ -190,9 +190,9 @@ def niconico_searchfunc(request):
 # マイリスト(カテゴリ一覧)
 class mylistView(View, LoginRequiredMixin):
   def get(self, request, *args, **kwargs): # 最初に読み込まれたとき
-    # カテゴリを全て取得する
+    # カテゴリを全て取得する(名前でソートする)
     categories = []
-    for i in VideoCategory.objects.filter(user=request.user).distinct().values("name"):
+    for i in VideoCategory.objects.filter(user=request.user).order_by("name").distinct().values("name"):
       print(i["name"])
       print(type(i["name"]))
       categories.append(i["name"])
@@ -204,12 +204,12 @@ class mylistView(View, LoginRequiredMixin):
     }
     return render(request, "mylist.html", context)
 
-  def post(self, request, *args, **kwargs): # カテゴリを追加したとき
+  def post(self, request, *args, **kwargs):
     print(request.POST)
-    print(request.POST["category_add"])
-    category_add = request.POST["category_add"] # 追加するカテゴリ
-    
-    if category_add != "":
+    if request.POST.get("category_add", False) != False:
+      # カテゴリを追加する
+      category_add = request.POST["category_add"] # 追加するカテゴリ
+        
       form = VideoCategoryReservationForm({
         "name":category_add,
         "user":request.user
@@ -224,14 +224,14 @@ class mylistView(View, LoginRequiredMixin):
         vc.save() # VideoCategoryモデルに追加する
         messages.success(request,"カテゴリ「" + category_add + "」が追加されました")
       else: # 同じデータが既にあるとき
-          messages.error(request, category_add + "は既に存在します")
+        messages.error(request, "カテゴリ「" + category_add + "」は既に存在します")
     else:
       # カテゴリが入力されなかったとき
       messages.error(request,"追加するカテゴリを入力してください")
 
     # カテゴリを全て取得する
     categories = []
-    for i in VideoCategory.objects.filter(user=request.user).distinct().values("name"):
+    for i in VideoCategory.objects.filter(user=request.user).order_by("name").distinct().values("name"):
       print(i["name"])
       print(type(i["name"]))
       categories.append(i["name"])
@@ -248,11 +248,10 @@ class mylistView(View, LoginRequiredMixin):
 @login_required
 def mylist_categoryfunc(request, pk):
   # pk: 選択したカテゴリの名前
-
   print(pk)
   print(type(pk))
 
-  if request.method == "POST":
+  if request.method == "POST": # 削除する動画を選択したとき
     # 選択した動画を削除する
     category_name = request.POST.get("category_name")
     print(category_name)
@@ -303,6 +302,9 @@ def mylist_categoryfunc(request, pk):
 
     video_info.append(d)
 
+  if video_info == []:
+    messages.error(request, "このカテゴリには動画が追加されていません")
+
   params = {
     "pk":pk,
     "video_info":video_info
@@ -322,6 +324,12 @@ def addMylistFunc(request):
     # print(request.POST['url']) # 動画のURL
     # print(request.POST['thumbnail']) # 動画のサムネイル
     # print(request.user) # ログインしているユーザー
+
+    d = {}
+    d["title"] = request.POST["title"]
+    d["url"] = request.POST["url"]
+    d["thumbnail"] = request.POST["thumbnail"]
+    d["categories"] = VideoCategory.objects.filter(user=request.user).distinct()
 
     category_checked = False # カテゴリが1つ以上選択されていればTrue
 
@@ -358,33 +366,7 @@ def addMylistFunc(request):
     if category_checked == False: # カテゴリが1つも選択されていないとき
       messages.error(request,"最低1つ以上選択してください")
 
-  return render(request, "mylist_add.html")
-
-# マイリスト削除
-class deleteMylistView(View, LoginRequiredMixin):
-  def post(self, request, *args, **kwargs):
-    '''searchRusult.html post処理'''
-    videos = self.request.POST.getlist('video',[])
-    print(videos)
-		# 1つ以上選択された時
-    if videos != []:
-      for video in videos:
-        selected_title = Video.objects.get(title=video).title
-        print(selected_title)
-        Video.objects.filter(title=video).delete() # モデルから削除する
-        messages.success(request, selected_title+'をマイリストから削除しました')
-
-      context = {
-      # select処理
-			'mylist': Video.objects.filter(user=self.request.user).order_by('-id')
-			}
-      return render(request, 'mylist.html', context)
-      return HttpResponse(status=204)
-
-		# 1つも選択されなかった時
-    else:
-      messages.error(request,"最低1つ以上選択してください")
-      return redirect('mylist')
+  return render(request, "mylist_add.html", d)
 
 # ログイン
 class SiteUserLoginView(View):

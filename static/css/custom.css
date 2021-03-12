@@ -21,13 +21,24 @@
   width: 250px; */
 }
 
-#input {
-  border: none;
-  outline: none;
-  color: #a00;
+.category {
+	list-style: none;
+	width: 150px;
+	height: 30px;
+	margin: 3px;
+	/* padding: 2px; */
+	display: block;
+	font-size: 18px;
+	text-align: center;
+	border: none;
+	background-color: #CFC;
 }
 
-/* #topmenu {
-  color: #f00;
-  background-color: #0f0;
-} */
+.link {
+	display: block;
+	text-decoration: none;
+}
+
+#add_text {
+  margin-left: 20px;
+}

@@ -5,33 +5,21 @@
 <h1>マイリスト</h1>
 <div id="mylist">
   <p>カテゴリ一覧</p>
-  {% for category in categories %}
-    {{ category }}
-    <a href="{% url 'mylist_category' category %}">カテゴリに移動</a><br>
-  {% endfor %}
+  <ul>
+    {% for category in categories %}
+      <li class="category">
+        <a href="{% url 'mylist_category' category %}" class="link">
+          {{ category }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
 
   <form method="POST">
     {% csrf_token %}
-    <input type="text" placeholder="カテゴリを追加" name="category_add">
+    <input type="text" placeholder="カテゴリを追加" name="category_add" id="add_text">
     <button type="submit">追加</button>
   </form>
 </div>
-
-<!-- 動画を選択して削除する -->
-<!-- <div id="select_mylist_delete">
-    <form action="{% url 'mylist_delete' %}" method="post">
-        {% csrf_token %}
-        {% for i in mylist %}
-            <input class="recipe-btn" type="checkbox" name="video" id="{{ i.url }}" value="{{ i }}">
-            {{ i.title }}<br>
-            <img src="{{ i.thumbnail }}" /><br>
-        {% endfor %}
-        <br>
-        <input class="btn btn-outline-success" type="submit" value="削除する">
-    </form>
-</div>
-
-<p class="btn btn-link" id="select" onclick="clickBtn3()">選択</p>
-<p class="btn btn-link" id="back" onclick="clickBtn4()">戻す</p> -->
 
 {% endblock %}
