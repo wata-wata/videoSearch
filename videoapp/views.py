@@ -387,7 +387,8 @@ class SiteUserLoginView(View):
 
         messages.success(request, "ログインしました")
 
-        return redirect("site_user_profile")
+        # ログインしたらyoutube検索に遷移する
+        return redirect("../youtube_search")
 
 # ログアウト
 class SiteUserLogoutView(LoginRequiredMixin, View):
