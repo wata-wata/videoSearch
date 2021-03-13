@@ -375,6 +375,7 @@ class SiteUserLoginView(View):
         context = {
             "form": SiteUserLoginForm(),
         }
+
         return render(request, "siteUser/login.html", context)
 
     def post(self, request, *args, **kwargs):
