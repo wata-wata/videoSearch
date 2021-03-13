@@ -188,8 +188,9 @@ def niconico_searchfunc(request):
   return render(request, 'niconico_search.html', params)
 
 # マイリスト(カテゴリ一覧)
-class mylistView(View, LoginRequiredMixin):
-  def get(self, request, *args, **kwargs): # 最初に読み込まれたとき
+@login_required
+def mylistfunc(request):
+  if request.method == "GET": # 最初に関数が呼ばれたとき
     # カテゴリを全て取得する(名前でソートする)
     categories = []
     for i in VideoCategory.objects.filter(user=request.user).order_by("name").distinct().values("name"):
@@ -204,7 +205,7 @@ class mylistView(View, LoginRequiredMixin):
     }
     return render(request, "mylist.html", context)
 
-  def post(self, request, *args, **kwargs):
+  elif request.method == "POST":
     print(request.POST)
     if request.POST.get("category_add", False) != False:
       # カテゴリを追加する

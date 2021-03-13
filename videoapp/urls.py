@@ -14,7 +14,7 @@ urlpatterns = [
   path("youtube_search/", youtube_searchfunc, name='youtube_search'),
   path("", youtube_searchfunc, name='youtube_search'),
   # マイリスト(カテゴリ一覧)
-  path("mylist/", mylistView.as_view(), name="mylist"),
+  path("mylist/", mylistfunc, name="mylist"),
   # マイリスト(カテゴリ別)
   path("mylist_category/<str:pk>", mylist_categoryfunc, name="mylist_category"),
   # マイリスト(動画追加)
