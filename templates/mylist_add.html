@@ -10,42 +10,45 @@
 {% endblock header %}
 
 {% block content %}
-<p>マイリストに追加</p>
-<a href="{{ url }}" target="_blank" rel="noopener noreferrer">
-  {{ title }}<br>
-  <img src="{{ thumbnail }}" /><br>
-</a>
+<h1 class="title">マイリストに追加</h1>
 
-<!-- カテゴリが1つ以上あるとき -->
-{% if categories %}
-<h3>追加するカテゴリを選択</h3>
-  <form action="{% url 'mylist_add' %}" method="post">
+<div class="content">
+  <a href="{{ url }}" target="_blank" rel="noopener noreferrer">
+    {{ title }}<br>
+    <img src="{{ thumbnail }}" /><br>
+  </a>
+
+  <!-- カテゴリが1つ以上あるとき -->
+  {% if categories %}
+  <h3>追加するカテゴリを選択</h3>
+    <form action="{% url 'mylist_add' %}" method="post">
+      {% csrf_token %}
+      {% for category in categories %}
+        <!-- カテゴリを表示する -->
+        <p>
+          <input type="checkbox" id="{{ category }}" name="{{ category }}" />
+          {{ category }} 
+        </p>
+      {% endfor %}
+
+      <!-- データを渡す -->
+      <input type="hidden" name="title" value="{{ title }}" />
+      <input type="hidden" name="url" value="{{ url }}" />
+      <input type="hidden" name="thumbnail" value="{{ thumbnail }}" />
+      <button type="submit">追加する</button>
+  </form>
+
+  <!-- カテゴリがないとき -->
+  {% else %}
+  <h3>カテゴリが存在しません</h3>
+  <form action="{% url 'mylist' %}" method="post">
     {% csrf_token %}
-    {% for category in categories %}
-      <!-- カテゴリを表示する -->
-      <p>
-        <input type="checkbox" id="{{ category }}" name="{{ category }}" />
-        {{ category }} 
-      </p>
-    {% endfor %}
+    <button type="submit">マイリストに移動</button>
+  </form>
 
-    <!-- データを渡す -->
-    <input type="hidden" name="title" value="{{ title }}" />
-    <input type="hidden" name="url" value="{{ url }}" />
-    <input type="hidden" name="thumbnail" value="{{ thumbnail }}" />
-    <button type="submit">追加する</button>
-</form>
+  {% endif %}
 
-<!-- カテゴリがないとき -->
-{% else %}
-<h3>カテゴリが存在しません</h3>
-<form action="{% url 'mylist' %}" method="post">
-  {% csrf_token %}
-  <button type="submit">マイリストに移動</button>
-</form>
-
-{% endif %}
-
-<a href="{% url 'youtube_search' %}">youtube検索に戻る</a>
-<a href="{% url 'niconico_search' %}">niconico検索に戻る</a>
+  <a href="{% url 'youtube_search' %}">youtube検索に戻る</a>
+  <a href="{% url 'niconico_search' %}">niconico検索に戻る</a>
+</div>
 {% endblock content %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block customcss %}
+{% endblock customcss %}
+
+{% block header %}
+<!-- <div class="alert alert-primary" role="alert">
+    youtube
+</div> -->
+{% endblock header %}
+
+{% block content %}
+
+<h1 class="title">トップページ</h1>
+
+<div class="content">
+  <div class="box">
+    <p class="about">このサイトについて</p>
+    <p>このサイトでは、YouTubeとニコニコ動画の動画を検索と、マイリストへの動画の保存ができます。</p>
+    <p>マイリストの利用には、会員登録とログインが必要です。</p>
+    <div class="side">
+      <a href="{% url 'site_user_register' %}">会員登録</a>
+    </div>
+    <div class="side">
+      <a href="{% url 'site_user_login' %}">ログイン</a>
+    </div>
+  </div>
+  <div class="side box menu">
+    <a href="{% url 'youtube_search' %}">YouTube検索</a>
+    <p>キーワードを入力すると、YouTubeの動画を検索できます。検索結果はマイリストに保存できます。</p>
+  </div>
+  <div class="side box menu">
+    <a href="{% url 'niconico_search' %}">ニコニコ動画検索</a>
+    <p>キーワードを入力すると、ニコニコ動画の動画を検索できます。検索結果はマイリストに保存できます。</p>
+  </div>
+  <div class="side box menu">
+    <a href="{% url 'mylist' %}">マイリスト</a>
+    <p>動画のマイリストを、カテゴリごとに管理することができます。</p>
+  </div>
+</div>
+
+{% endblock content %}

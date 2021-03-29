@@ -11,33 +11,42 @@
 
 {% block content %}
 
-<h1>niconico検索</h1>
+<h1 class="title">niconico検索</h1>
 
-<div id="search"> <!-- 最初は表示、マイリストに追加するときは非表示 -->
-<form method="POST" class="search_form">
-  {% csrf_token %}
-  {{ form }}
-  <button type="submit" class="search_button">検索</button>
-</form>
-
-<!-- 検索結果 -->
-{% for i in result %}
-  <!-- 新規タブで開く -->
-  <a href="{{ i.url }}" target="_blank" rel="noopener noreferrer">
-    {{ i.title }}<br>
-    <img src="{{ i.thumbnail }}" />
-  </a>
-  <p>再生回数:{{ i.viewCounter }}回</p>
-  <!-- 追加画面に遷移する -->
-  <form method="POST">
+<div class="content"> <!-- 最初は表示、マイリストに追加するときは非表示 -->
+  <form method="POST" class="search_form">
     {% csrf_token %}
-    <!-- データを追加画面に渡す -->
-    <input type="hidden" name="title" value="{{ i.title }}" />
-    <input type="hidden" name="url" value="{{ i.url }}" />
-    <input type="hidden" name="thumbnail" value="{{ i.thumbnail }}" />
-    <button type="submit">マイリストに追加</button><br>
+    {{ form }}
+    <button type="submit" class="search_button">検索</button>
   </form>
-{% endfor %}
+
+  <!-- 検索結果 -->
+  {% for i in result %}
+    <div class="box">
+      <!-- リンクを新規タブで開く -->
+      <a href="{{ i.url }}" target="_blank" rel="noopener noreferrer">
+        {{ i.title }}<br>
+      </a>
+      <div class="side">
+        <!-- リンクを新規タブで開く -->
+        <a href="{{ i.url }}" target="_blank" rel="noopener noreferrer">    
+          <img src="{{ i.thumbnail }}" />
+        </a>  
+        <p>再生回数:{{ i.viewCounter }}回</p>
+      </div>
+      <div class="side">
+        <!-- 追加画面に遷移する -->
+        <form method="POST">
+          {% csrf_token %}
+          <!-- データを追加画面に渡す -->
+          <input type="hidden" name="title" value="{{ i.title }}" />
+          <input type="hidden" name="url" value="{{ i.url }}" />
+          <input type="hidden" name="thumbnail" value="{{ i.thumbnail }}" />
+          <button type="submit" class="mylist_add_button">マイリストに追加</button><br>
+        </form>
+      </div>
+    </div>
+  {% endfor %}
 </div>
 
 {% endblock content %}

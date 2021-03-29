@@ -2,37 +2,43 @@
 
 {% block content %}
 
+<div class="content">
 <p>カテゴリ : {{ pk }}</p>
 <a href="{% url 'mylist' %}">カテゴリ一覧に戻る</a><br>
 <button id="edit_button" onclick="edit()">編集</button>
 <button id="back_button" onclick="back()">戻る</button>
 
-<!-- 動画を表示する -->
-<div id="mylist">
-  {% for i in video_info %}
-    <a href="{{ i.url }}" target="_blank" rel="noopener noreferrer">
-      {{ i.title }}<br>
-      <img src="{{ i.thumbnail }}" /><br>
-    </a>
-  {% endfor %}
-</div>
-
-<!-- 動画を選択して削除する -->
-<div id="select_mylist_delete">
-  <form method="post">
-		{% csrf_token %}
+  <!-- 動画を表示する -->
+  <div id="mylist">
     {% for i in video_info %}
-      <p>
-        <!-- チェックボックス -->
-        <input type="checkbox" name="check_delete" id="{{ i.recipeId }}" value="{{ i }}">
-        {{ i.title }}<br>
-        <img src="{{ i.thumbnail }}" /><br>
-      </p>
+      <div class="box">
+        <a href="{{ i.url }}" target="_blank" rel="noopener noreferrer">
+          {{ i.title }}<br>
+          <img src="{{ i.thumbnail }}" /><br>
+        </a>
+      </div>
     {% endfor %}
-    <!-- カテゴリ名を渡す -->
-    <input type="hidden" name="category_name" value="{{ pk }}" />
-    <button type="submit">選択した動画を削除する</button>
-  </form>
+  </div>
+
+  <!-- 動画を選択して削除する -->
+  <div id="select_mylist_delete">
+    <form method="post">
+      {% csrf_token %}
+      {% for i in video_info %}
+        <div class="box">
+          <p>
+            <!-- チェックボックス -->
+            <input type="checkbox" name="check_delete" id="{{ i.recipeId }}" value="{{ i }}">
+            {{ i.title }}<br>
+            <img src="{{ i.thumbnail }}" /><br>
+          </p>
+        </div>
+      {% endfor %}
+      <!-- カテゴリ名を渡す -->
+      <input type="hidden" name="category_name" value="{{ pk }}" />
+      <button type="submit">選択した動画を削除する</button>
+    </form>
+  </div>
 </div>
 
 {% endblock %}

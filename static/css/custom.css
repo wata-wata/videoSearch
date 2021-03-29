@@ -23,7 +23,7 @@
 
 .category {
 	list-style: none;
-	width: 150px;
+	width: 300px;
 	height: 30px;
 	margin: 3px;
 	/* padding: 2px; */
@@ -34,11 +34,69 @@
 	background-color: #CFC;
 }
 
-.link {
+.link { /* カテゴリ一覧 */
 	display: block;
 	text-decoration: none;
+  text-align: left;
 }
 
 #add_text {
-  margin-left: 20px;
+  margin-left: 40px;
+  margin-right: 40px;
+}
+
+.title { /* YouTube検索, niconico検索 */
+  color: #ff6e00;
+  margin-left: 40px;
+  margin-right: 40px;
+}
+
+.app_title { /* Video Search */
+  color: green;
+  font-size: 30px;
+}
+
+.box { /* 四角で囲む */
+  padding: 0.5em 1em;
+  margin: 2em 0;
+  border: double 5px #4ec4d3;
+  border-radius: 10px;
+}
+
+.content {
+  margin: 0 40px; /* 上下, 左右 */
+}
+
+.mylist_add_button {
+  flex: 1 1 auto;
+  margin: 5px;
+  padding: 15px;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  color: white;
+ /* text-shadow: 0px 0px 10px rgba(0,0,0,0.2);*/
+  box-shadow: 0 0 20px #eee;
+  border-radius: 10px;
+  /* グラデーション */
+  /* background-image: linear-gradient(to right, #f6d365 0%, #fda085 51%, #f6d365 100%); */
+  background-image: linear-gradient(to right, #E040FB, #5dd5e8);
+  border: 2px solid #fff;
+}
+
+.side { /* 横並び */
+  display: inline-block;
+}
+
+.app_title {
+  font-family: 'Londrina Shadow', cursive;
+  font-size: 30px;
+}
+
+.about {
+  color: #ff6e00;
+}
+
+.menu {
+  width: 45%;
 }

@@ -20,8 +20,9 @@ from oauth2client.tools import argparser
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
-def testfunc(request):
-  return render(request, 'youtube_search.html')
+# トップページ
+def topfunc(request):
+  return render(request, "top.html")
 
 # youtube --------------------------------------------------------------------------
 @login_required
@@ -389,8 +390,8 @@ class SiteUserLoginView(View):
 
         messages.success(request, "ログインしました")
 
-        # ログインしたらyoutube検索に遷移する
-        return redirect("../youtube_search")
+        # ログインしたらマイリストに遷移する
+        return redirect("../../mylist")
 
 # ログアウト
 class SiteUserLogoutView(LoginRequiredMixin, View):
