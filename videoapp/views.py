@@ -28,12 +28,9 @@ def topfunc(request):
 def youtube_searchfunc(request):
   params = {'word': '', 'form': None, 'result': []}
   if request.method == 'POST': # フォームが送信されたとき
-    # print(request.POST)
-    # print(request.POST.getlist('video', False))
     is_exist_word = request.POST.get('word', False)
     if is_exist_word != False: # 「検索」ボタンが押されたとき
       # 検索キーワードを受け取って検索する
-      # print(request.POST['word'])
       # keyに対応するvalueがあるかどうかでformのPOST処理を分ける
       form = SearchForm(request.POST)
       params['word'] = request.POST['word']
@@ -324,58 +321,77 @@ def mylist_categoryfunc(request, pk):
 # マイリスト追加
 @login_required
 def addMylistFunc(request):
-  # print("called addMylistFunc")
   if request.method == 'POST':
-    # 動画を、選択されたカテゴリのマイリストに追加する
-    # print(request.POST)
-
-    # print(request.POST['title']) # 動画のタイトル
-    # print(request.POST['url']) # 動画のURL
-    # print(request.POST['thumbnail']) # 動画のサムネイル
-    # print(request.user) # ログインしているユーザー
-
     d = {}
-    d["title"] = request.POST["title"]
-    d["url"] = request.POST["url"]
-    d["thumbnail"] = request.POST["thumbnail"]
-    d["categories"] = VideoCategory.objects.filter(user=request.user).distinct()
+    if "category_add_button" in request.POST:
+      # カテゴリを追加する
+      category_add = request.POST["category_add"] # 追加するカテゴリ
+        
+      form = VideoCategoryReservationForm({
+        "name":category_add,
+        "user":request.user
+      })
 
-    category_checked = False # カテゴリが1つ以上選択されていればTrue
+      if form.is_valid() == True:
+        # モデル「VideoCategory」に追加する
+        vc = VideoCategory(
+          name=category_add,
+          user=request.user
+        )
+        vc.save() # VideoCategoryモデルに追加する
+        messages.success(request,"カテゴリ「" + category_add + "」が追加されました")
+      else: # 同じデータが既にあるとき
+        messages.error(request, "カテゴリ「" + category_add + "」は既に存在します")
 
-    for key in request.POST:
-      if(request.POST[key]=='on'):
-        category_checked = True
+      d["title"] = request.POST["title"]
+      d["url"] = request.POST["url"]
+      d["thumbnail"] = request.POST["thumbnail"]
+      d["categories"] = VideoCategory.objects.filter(user=request.user).distinct()
 
-        print(request.POST['url'])
-        print(VideoCategory.objects.filter(name=key)[0].name)
+    elif "video_add_button" in request.POST:
+      # 選択した動画をマイリストに追加 ---------------
+      print("選択した動画をマイリストに追加")
+      d["title"] = request.POST["title"]
+      d["url"] = request.POST["url"]
+      d["thumbnail"] = request.POST["thumbnail"]
+      d["categories"] = VideoCategory.objects.filter(user=request.user).distinct()
 
-        # 重複しているデータがあるか判定する
-        form = VideoReservationForm({
-          'url':request.POST['url'],
-          'user':request.user,
-          'category':VideoCategory.objects.filter(name=key)[0]
-        })
+      category_checked = False # カテゴリが1つ以上選択されていればTrue
 
-        print(form.is_valid()) # Trueならモデルに追加する
+      for key in request.POST:
+        if(request.POST[key]=='on'):
+          category_checked = True
 
-        if form.is_valid() == True:
-          # モデル「Video」に追加する ---------------
-          v = Video(
-            title=request.POST['title'],
-            url=request.POST['url'],
-            thumbnail=request.POST['thumbnail'],
-            user=request.user,
-            category=VideoCategory.objects.filter(name=key)[0]
-          )
-          v.save() # 「Video」モデルに追加する
-          messages.success(request, request.POST['title'] + "をマイリスト(" + key + ")に追加しました")
-        else: # 同じデータが既にあるとき
-          messages.error(request, request.POST['title'] + "は既にマイリスト(" + key + ")に保存されています")
+          print(request.POST['url'])
+          print(VideoCategory.objects.filter(name=key)[0].name)
 
-    if category_checked == False: # カテゴリが1つも選択されていないとき
-      messages.error(request,"最低1つ以上選択してください")
+          # 重複しているデータがあるか判定する
+          form = VideoReservationForm({
+            'url':request.POST['url'],
+            'user':request.user,
+            'category':VideoCategory.objects.filter(name=key)[0]
+          })
 
-  return render(request, "mylist_add.html", d)
+          print(form.is_valid()) # Trueならモデルに追加する
+
+          if form.is_valid() == True:
+            # モデル「Video」に追加する ---------------
+            v = Video(
+              title=request.POST['title'],
+              url=request.POST['url'],
+              thumbnail=request.POST['thumbnail'],
+              user=request.user,
+              category=VideoCategory.objects.filter(name=key)[0]
+            )
+            v.save() # 「Video」モデルに追加する
+            messages.success(request, request.POST['title'] + "をマイリスト(" + key + ")に追加しました")
+          else: # 同じデータが既にあるとき
+            messages.error(request, request.POST['title'] + "は既にマイリスト(" + key + ")に保存されています")
+
+      if category_checked == False: # カテゴリが1つも選択されていないとき
+        messages.error(request,"最低1つ以上選択してください")
+
+    return render(request, "mylist_add.html", d)
 
 # ログイン
 class SiteUserLoginView(View):

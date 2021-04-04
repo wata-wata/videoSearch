@@ -40,11 +40,6 @@
   text-align: left;
 }
 
-#add_text {
-  margin-left: 40px;
-  margin-right: 40px;
-}
-
 .title { /* YouTube検索, niconico検索 */
   color: #ff6e00;
   margin-left: 40px;
@@ -76,7 +71,6 @@
   text-align: center;
   color: white;
   border-radius: 10px;
-
   background-color: #eda034;
   border: 2px solid #fff;
 }
@@ -122,4 +116,26 @@
 .back_search:hover {
   text-decoration: none;
   color: #fff;
+}
+
+.add_text { /* カテゴリを追加 */
+  margin-right: 5px;
+}
+
+#edit_button, #back_button { /* 編集, 戻る */
+  height: 40px;
+  text-align: center;
+  color: white;
+  border-radius: 10px;
+  background-color: #eda034;
+  border: 2px solid #fff;
+}
+
+.delete_button { /* 選択した動画を削除する */
+  height: 40px;
+  text-align: center;
+  color: white;
+  border-radius: 10px;
+  background-color: #f44336;
+  border: 2px solid #fff;
 }

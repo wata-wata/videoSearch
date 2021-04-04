@@ -31,11 +31,17 @@
         </p>
       {% endfor %}
 
+      <!-- <form method="POST"> カテゴリを追加 -------------------------------------------- 
+        {% csrf_token %}-->
+        <input type="text" placeholder="カテゴリを追加" name="category_add" class="add_text">
+        <button type="submit" name="category_add_button" class="mylist_add_button">追加</button><br>
+      <!-- </form> -->
+
       <!-- データを渡す -->
       <input type="hidden" name="title" value="{{ title }}" />
       <input type="hidden" name="url" value="{{ url }}" />
       <input type="hidden" name="thumbnail" value="{{ thumbnail }}" />
-      <button type="submit" class="mylist_add_button">追加する</button>
+      <button type="submit" name="video_add_button" class="mylist_add_button">選択した動画をマイリストに追加する</button><br>
   </form>
 
   <!-- カテゴリがないとき -->

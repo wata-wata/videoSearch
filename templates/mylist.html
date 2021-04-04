@@ -15,11 +15,13 @@
     {% endfor %}
   </ul>
 
-  <form method="POST">
-    {% csrf_token %}
-    <input type="text" placeholder="カテゴリを追加" name="category_add" id="add_text">
-    <button type="submit">追加</button>
-  </form>
+  <div class="content">
+    <form method="POST">
+      {% csrf_token %}
+      <input type="text" placeholder="カテゴリを追加" name="category_add" class="add_text">
+      <button type="submit" class="mylist_add_button">追加</button>
+    </form>
+  </div>
 </div>
 
 {% endblock %}
