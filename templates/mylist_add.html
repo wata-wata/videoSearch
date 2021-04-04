@@ -18,8 +18,6 @@
     <img src="{{ thumbnail }}" /><br>
   </a>
 
-  <!-- カテゴリが1つ以上あるとき -->
-  {% if categories %}
   <h3 class="subtitle">追加するカテゴリを選択</h3>
     <form action="{% url 'mylist_add' %}" method="post">
       {% csrf_token %}
@@ -31,11 +29,9 @@
         </p>
       {% endfor %}
 
-      <!-- <form method="POST"> カテゴリを追加 -------------------------------------------- 
-        {% csrf_token %}-->
+        <!-- カテゴリを追加 -->
         <input type="text" placeholder="カテゴリを追加" name="category_add" class="add_text">
         <button type="submit" name="category_add_button" class="mylist_add_button">追加</button><br>
-      <!-- </form> -->
 
       <!-- データを渡す -->
       <input type="hidden" name="title" value="{{ title }}" />
@@ -43,16 +39,6 @@
       <input type="hidden" name="thumbnail" value="{{ thumbnail }}" />
       <button type="submit" name="video_add_button" class="mylist_add_button">選択した動画をマイリストに追加する</button><br>
   </form>
-
-  <!-- カテゴリがないとき -->
-  {% else %}
-  <h3>カテゴリが存在しません</h3>
-  <form action="{% url 'mylist' %}" method="post">
-    {% csrf_token %}
-    <button type="submit">マイリストに移動</button>
-  </form>
-
-  {% endif %}
 
   <a href="{% url 'youtube_search' %}" class="back_search">YouTube検索に戻る</a>
   <a href="{% url 'niconico_search' %}" class="back_search">ニコニコ動画検索に戻る</a>
