@@ -20,7 +20,7 @@
 
   <!-- カテゴリが1つ以上あるとき -->
   {% if categories %}
-  <h3>追加するカテゴリを選択</h3>
+  <h3 class="subtitle">追加するカテゴリを選択</h3>
     <form action="{% url 'mylist_add' %}" method="post">
       {% csrf_token %}
       {% for category in categories %}
@@ -35,7 +35,7 @@
       <input type="hidden" name="title" value="{{ title }}" />
       <input type="hidden" name="url" value="{{ url }}" />
       <input type="hidden" name="thumbnail" value="{{ thumbnail }}" />
-      <button type="submit">追加する</button>
+      <button type="submit" class="mylist_add_button">追加する</button>
   </form>
 
   <!-- カテゴリがないとき -->
@@ -48,7 +48,7 @@
 
   {% endif %}
 
-  <a href="{% url 'youtube_search' %}">youtube検索に戻る</a>
-  <a href="{% url 'niconico_search' %}">niconico検索に戻る</a>
+  <a href="{% url 'youtube_search' %}" class="back_search">YouTube検索に戻る</a>
+  <a href="{% url 'niconico_search' %}" class="back_search">ニコニコ動画検索に戻る</a>
 </div>
 {% endblock content %}

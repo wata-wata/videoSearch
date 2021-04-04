@@ -14,26 +14,11 @@
 <h1 class="title">YouTube検索</h1>
 
 <div class="content"> <!-- 最初は表示、マイリストに追加するときは非表示 -->
-  <form method="POST" class="search_form">
+  <form method="POST">
     {% csrf_token %}
     {{ form }}
     <input type="submit" class="search_button" value="検索"></input>
   </form>
-
-  <!-- <form method="POST" name="search_form">
-    {% csrf_token %}
-    <dl class="search_form">
-      <dt>{{ form }}</dt>
-      <dd><button type="submit">Search</button></dd>
-    </dl>
-  </form>
-
-  <form action="#" name="search" method="post">
-    <dl class="search">
-      <dt><input type="text" name="search" value="" placeholder="検索するテキストを入力..." /></dt>
-      <dd><button>Search</button></dd>
-    </dl>
-  </form> -->
 
   <!-- 検索結果 -->
   {% for i in result %}

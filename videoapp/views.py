@@ -25,7 +25,6 @@ def topfunc(request):
   return render(request, "top.html")
 
 # youtube --------------------------------------------------------------------------
-@login_required
 def youtube_searchfunc(request):
   params = {'word': '', 'form': None, 'result': []}
   if request.method == 'POST': # フォームが送信されたとき
@@ -97,13 +96,16 @@ def youtube_searchfunc(request):
 
     # 「マイリストに追加」ボタンが押されたとき、mylist_add.htmlに遷移する
     elif request.POST.get('title', False) != False:
-      # print(request.POST.get('title', False))
+      if not request.user.is_authenticated: # ログイン認証
+        messages.error(request, "ログインしてください")
+        return redirect('/siteUser/login')
       d = {}
       d['title'] = request.POST['title']
       d['url'] = request.POST['url']
       d['thumbnail'] = request.POST['thumbnail']
       # d['categories'] = VideoCategory.objects.all # カテゴリ一覧
       d['categories'] = VideoCategory.objects.filter(user=request.user).distinct()
+
       return render(request, 'mylist_add.html', d)
 
     params['form'] = SearchForm()
@@ -114,7 +116,6 @@ def youtube_searchfunc(request):
   return render(request, 'youtube_search.html', params)
 
 # niconico --------------------------------------------------------------------------
-@login_required
 def niconico_searchfunc(request):
   params = {'word': '', 'form': None, 'result': []}
   if request.method == 'POST': # フォームが送信されたとき
@@ -173,7 +174,9 @@ def niconico_searchfunc(request):
 
     # 「マイリストに追加」ボタンが押されたとき、mylist_add.htmlに遷移する
     elif request.POST.get('title', False) != False:
-      print(request.POST.get('title', False))
+      if not request.user.is_authenticated: # ログイン認証
+        messages.error(request, "ログインしてください")
+        return redirect('/siteUser/login')
       d = {}
       d['title'] = request.POST['title']
       d['url'] = request.POST['url']
@@ -189,8 +192,12 @@ def niconico_searchfunc(request):
   return render(request, 'niconico_search.html', params)
 
 # マイリスト(カテゴリ一覧)
-@login_required
+# @login_required
 def mylistfunc(request):
+  if not request.user.is_authenticated: # ログイン認証
+        messages.error(request, "ログインしてください")
+        return redirect('/siteUser/login')
+
   if request.method == "GET": # 最初に関数が呼ばれたとき
     # カテゴリを全て取得する(名前でソートする)
     categories = []
