@@ -5,7 +5,11 @@
 <div class="content">
 <p>カテゴリ : {{ pk }}</p>
 <a href="{% url 'mylist' %}">カテゴリ一覧に戻る</a><br>
+
+{% if video_info %}
 <button id="edit_button" onclick="edit()">編集</button>
+{% endif %}
+
 <button id="back_button" onclick="back()">戻る</button>
 
   <!-- 動画を表示する -->
