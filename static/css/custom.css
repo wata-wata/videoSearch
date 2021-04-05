@@ -1,6 +1,6 @@
 @media screen and (min-width: 481px) { /* PC */
   .title {
-    font-size: 48px;
+    font-size: 40px;
   }
 
   .search_inputtext { /* 検索フォーム(文字入力) */
