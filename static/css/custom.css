@@ -167,3 +167,9 @@
   background-color: #f44336;
   border: 2px solid #fff;
 }
+
+.category_list { /* カテゴリ一覧 */
+  color: #ff6e00;
+  margin-left: 40px;
+  margin-right: 40px;
+}
