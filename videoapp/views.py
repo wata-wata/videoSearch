@@ -332,7 +332,11 @@ def addMylistFunc(request):
         "user":request.user
       })
 
-      if form.is_valid() == True:
+      if category_add == "": # カテゴリが入力されていないとき
+        print("カテゴリを入力してください")
+        messages.error(request, "カテゴリを入力してください")
+
+      elif form.is_valid() == True:
         # モデル「VideoCategory」に追加する
         vc = VideoCategory(
           name=category_add,
