@@ -17,7 +17,8 @@
   <form method="POST">
     {% csrf_token %}
     {{ form }}
-    <button type="submit" class="search_button">検索</button>
+    <!-- <button type="submit" class="search_button">検索</button> -->
+    <input type="submit" class="search_button" value="検索"></input>
   </form>
 
   <!-- 検索結果 -->
