@@ -13,10 +13,12 @@
 <h1 class="title">マイリストに追加</h1>
 
 <div class="content">
-  <a href="{{ url }}" target="_blank" rel="noopener noreferrer">
-    {{ title }}<br>
-    <img src="{{ thumbnail }}" /><br>
-  </a>
+  <div class="box">
+    <a href="{{ url }}" target="_blank" rel="noopener noreferrer">
+      {{ title }}<br>
+      <img src="{{ thumbnail }}" /><br>
+    </a>
+  </div>
 
   <h3 class="subtitle">追加するカテゴリを選択</h3>
     <form action="{% url 'mylist_add' %}" method="post">

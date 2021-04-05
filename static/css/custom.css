@@ -10,6 +10,14 @@
   .search_button { /* 検索フォーム(検索ボタン) */
     width: 80px;
   }
+
+  .side { /* 横並び */
+    display: inline-block;
+  }
+
+  .menu {
+    width: 49%;
+  } 
 }
 
 @media screen and (max-width: 480px) { /* スマホ */
@@ -23,10 +31,6 @@
 
   .search_button { /* 検索フォーム(検索ボタン) */
     width: 60px;
-  }
-
-  .menu {
-    height: 300px;
   }
 }
 
@@ -107,9 +111,9 @@
   border: 2px solid #fff;
 }
 
-.side { /* 横並び */
+/* .side {
   display: inline-block;
-}
+} */
 
 .app_title {
   font-family: 'Londrina Shadow', cursive;
@@ -120,9 +124,9 @@
   color: #ff6e00;
 }
 
-.menu {
+/* .menu {
   width: 49%;
-}
+} */
 
 .search_inputtext { /* 検索フォーム(文字入力) */
   background-color:#fff;
