@@ -24,6 +24,10 @@
   .search_button { /* 検索フォーム(検索ボタン) */
     width: 60px;
   }
+
+  .menu {
+    height: 300px;
+  }
 }
 
 #mylist_result .mylist-btn {
