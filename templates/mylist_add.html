@@ -32,8 +32,10 @@
       {% endfor %}
 
         <!-- カテゴリを追加 -->
-        <input type="text" placeholder="カテゴリを追加" name="category_add" class="add_text">
-        <button type="submit" name="category_add_button" class="mylist_add_button">追加</button><br>
+        <div class="category_checkbox">
+          <input type="text" placeholder="カテゴリを追加" name="category_add" class="add_text">
+          <button type="submit" name="category_add_button" class="mylist_add_button">追加</button><br>
+        </div>
 
       <!-- データを渡す -->
       <input type="hidden" name="title" value="{{ title }}" />

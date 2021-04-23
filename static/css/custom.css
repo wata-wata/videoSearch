@@ -147,6 +147,7 @@
   background: #4db56a;
   border-radius: 5px;
   color: #fff;
+  margin-top: 20px;
 }
 
 .back_search:hover {
@@ -180,4 +181,8 @@
   color: #ff6e00;
   margin-left: 40px;
   margin-right: 40px;
+}
+
+.category_checkbox {
+  margin-bottom: 20px;
 }
