@@ -16,6 +16,7 @@
     {% csrf_token %}
     <!-- {{ form }} -->
     <input type="text" value="{{ request.GET.word }}" name="word" placeholder="キーワードを入力" class="search_inputtext"></input>
+    <input type="hidden" value="1" name="page" />
     <button type="submit" class="search_button" value="検索">検索</button>
   </form>
 
