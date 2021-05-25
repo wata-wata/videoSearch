@@ -4,7 +4,7 @@
 
 <h1 class="title">マイリスト</h1>
 <div id="mylist">
-  <p class="category_list">カテゴリ一覧</p>
+  <!-- <p class="category_list">カテゴリ一覧</p> -->
   <ul>
     {% for category in categories %}
       <li class="category">
@@ -18,7 +18,7 @@
   <div class="content">
     <form method="POST">
       {% csrf_token %}
-      <input type="text" placeholder="カテゴリを追加" name="category_add" class="add_text">
+      <input type="text" placeholder="カテゴリを追加" name="category_add" class="add_text" maxlength="15">
       <button type="submit" class="mylist_add_button">追加</button>
     </form>
   </div>

@@ -67,7 +67,7 @@
 	font-size: 18px;
 	text-align: center;
 	border: none;
-	background-color: #CFC;
+	background-color: #dddddd;
 }
 
 .link { /* カテゴリ一覧 */
@@ -156,6 +156,7 @@
 }
 
 .add_text { /* カテゴリを追加 */
+  width: 250px;
   margin-right: 5px;
 }
 

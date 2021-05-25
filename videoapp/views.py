@@ -34,7 +34,7 @@ def youtube_searchfunc(request):
     search_response = youtube.search().list(
         q=word, # 検索キーワード
         part="id,snippet",
-        maxResults=50, # 取得する動画の数
+        maxResults=10, # 取得する動画の数
         # order="relevance" # order: 並び替える基準
         order=sort # order: 並び替える基準
       ).execute()
@@ -159,7 +159,7 @@ def youtube_searchfunc(request):
       # ページング処理 -----------
       page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
       # 1ページに表示するデータ数を指定する
-      paginator = Paginator(params['result'], 10)
+      paginator = Paginator(params['result'], 3)
       try:
         results = paginator.page(page)
       except PageNotAnInteger:
@@ -172,7 +172,7 @@ def youtube_searchfunc(request):
 
 # niconico --------------------------------------------------------------------------
 def niconico_searchfunc(request):
-  def searchfunc(word): # 検索する関数
+  def searchfunc(word, sort): # 検索する関数
     REQUEST_URL = "https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search"
 
     # クエリ文字列仕様
@@ -180,9 +180,10 @@ def niconico_searchfunc(request):
         'q':word,
         'targets':'title,tags',
         'fields':'contentId,title,viewCounter,thumbnailUrl,description',
-        '_sort':'viewCounter',
+        '_sort':sort,
         '_context':'nico_jsonFilter',
-        '_limit':50, # 取得する動画の数
+        # '_limit':50, # 取得する動画の数
+        '_limit':10,
         # 'jsonFilter':jsonFilter # 条件を絞る
     }
 
@@ -199,22 +200,41 @@ def niconico_searchfunc(request):
       d['url'] = "https://nico.ms/" + responses['data'][i]['contentId']
       params['result'].append(d)
 
-  params = {'word': '', 'form': None, 'result': []}
-  if request.method == 'POST': # フォームが送信されたとき
-    is_exist_word = request.POST.get('word', False)
-    if is_exist_word != False: # 検索キーワードを受け取って検索する
-      form = SearchForm(request.POST)
-      params['word'] = request.POST['word']
-      params['form'] = form
-      word = request.POST['word'] # 検索キーワード
+  params = { # 渡すデータ
+    'word': '',
+    'form': None,
+    'result': [],
+    'sort': '再生回数の多い順' 
+  }
 
-      # 検索する
-      searchfunc(word)
+  if request.method == 'POST': # フォームが送信されたとき
+    # 並び替えのボタン(関連性が高い順など)が押されたとき
+    if request.POST.get('sort', False) != False:
+      print(request.POST['sort'])
+      print(request.GET['word'])
+      print(request.GET['page'])
+      sort = request.POST['sort']
+      word = request.GET['word']
+      params['sort'] = sort # テキストを変更する
+
+      # 指定された条件で検索する -------------------
+      if sort == '再生回数の多い順':
+        print('sort_viewCounter')
+        searchfunc(word, 'viewCounter') # 検索する
+      elif sort == 'マイリスト数・お気に入り数が多い順':
+        print('sort_mylistCounter')
+        searchfunc(word, 'mylistCounter') # 検索する
+      elif sort == '投稿日時が新しい順':
+        print('sort_startTime')
+        searchfunc(word, 'startTime') # 検索する
+      elif sort == 'コメント数の多い順':
+        print('sort_commentCounter')
+        searchfunc(word, 'commentCounter') # 検索する
 
       # ページング処理 -----------
-      page = request.GET.get('page', 1) # 現在のページ数を指定する
+      page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
       # 1ページに表示するデータ数を指定する
-      paginator = Paginator(params['result'], 10)
+      paginator = Paginator(params['result'], 3)
       try:
         results = paginator.page(page)
       except PageNotAnInteger:
@@ -222,32 +242,28 @@ def niconico_searchfunc(request):
       except EmptyPage:
         results = paginator.page(paginator.num_pages)
       params['result'] = results
+    # is_exist_word = request.POST.get('word', False)
+    # if is_exist_word != False: # 検索キーワードを受け取って検索する
 
-      # REQUEST_URL = "https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search"
+      # form = SearchForm(request.POST)
+      # params['word'] = request.POST['word']
+      # params['form'] = form
+      # word = request.POST['word'] # 検索キーワード
 
-      # # クエリ文字列仕様
-      # query = {
-      #     'q':word,
-      #     'targets':'title,tags',
-      #     'fields':'contentId,title,viewCounter,thumbnailUrl,description',
-      #     '_sort':'viewCounter',
-      #     '_context':'nico_jsonFilter',
-      #     '_limit':10,
-      #     # 'jsonFilter':jsonFilter # 条件を絞る
-      # }
+      # # 検索する
+      # searchfunc(word)
 
-      # # データを取得する
-      # responses = requests.get(REQUEST_URL, query).json()
-
-      # print(responses)
-
-      # for i in range(len(responses['data'])):
-      #   d = {} # 辞書型
-      #   d['title'] = responses['data'][i]['title']
-      #   d['viewCounter'] = responses['data'][i]['viewCounter']
-      #   d['thumbnail'] = responses['data'][i]['thumbnailUrl']
-      #   d['url'] = "https://nico.ms/" + responses['data'][i]['contentId']
-      #   params['result'].append(d)
+      # # ページング処理 -----------
+      # page = request.GET.get('page', 1) # 現在のページ数を指定する
+      # # 1ページに表示するデータ数を指定する
+      # paginator = Paginator(params['result'], 10)
+      # try:
+      #   results = paginator.page(page)
+      # except PageNotAnInteger:
+      #   results = paginator.page(1)
+      # except EmptyPage:
+      #   results = paginator.page(paginator.num_pages)
+      # params['result'] = results
 
     # 「マイリストに追加」ボタンが押されたとき、mylist_add.htmlに遷移する
     elif request.POST.get('title', False) != False:
@@ -265,18 +281,26 @@ def niconico_searchfunc(request):
 
     params['form'] = SearchForm()
   
-  else: # 最初に関数が呼ばれたとき
+  elif request.method == 'GET': # 最初に関数が呼ばれたとき
     params['form'] = SearchForm()
     print("get-------")
-    if 'q' in request.GET: # 他のページから遷移したとき
-      # URLから検索ワードを取得する
-      word = request.GET.get('q') # 検索キーワード
-      print(word)
-      params['word'] = word
+
+    is_exist_word = request.GET.get('word', False)
+    if is_exist_word != False: # 「検索」ボタンが押されたとき、ページ番号が異なるページから遷移したとき
+      print("検索")
+      print(is_exist_word)
+      # 検索キーワードを受け取って検索する
+      # keyに対応するvalueがあるかどうかでformのPOST処理を分ける
+      form = SearchForm(request.POST)
+      params['word'] = request.GET['word']
+      params['form'] = form
+      word = request.GET['word'] # 検索キーワード
+
       # 検索する
-      searchfunc(word)
+      searchfunc(word, 'viewCounter')
+
       # ページング処理 -----------
-      page = request.GET.get('page', int(request.GET.get('page'))) # 現在のページ数を指定する
+      page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
       # 1ページに表示するデータ数を指定する
       paginator = Paginator(params['result'], 10)
       try:
@@ -286,6 +310,25 @@ def niconico_searchfunc(request):
       except EmptyPage:
         results = paginator.page(paginator.num_pages)
       params['result'] = results
+
+    # if 'q' in request.GET: # 他のページから遷移したとき
+    #   # URLから検索ワードを取得する
+    #   word = request.GET.get('q') # 検索キーワード
+    #   print(word)
+    #   params['word'] = word
+    #   # 検索する
+    #   searchfunc(word)
+    #   # ページング処理 -----------
+    #   page = request.GET.get('page', int(request.GET.get('page'))) # 現在のページ数を指定する
+    #   # 1ページに表示するデータ数を指定する
+    #   paginator = Paginator(params['result'], 10)
+    #   try:
+    #     results = paginator.page(page)
+    #   except PageNotAnInteger:
+    #     results = paginator.page(1)
+    #   except EmptyPage:
+    #     results = paginator.page(paginator.num_pages)
+    #   params['result'] = results
 
   return render(request, 'niconico_search.html', params)
 
@@ -407,6 +450,12 @@ def mylist_categoryfunc(request, pk):
     # URL
     print(v[0].url)
     d["url"] = v[0].url
+
+    if "youtube" in d["url"]:
+      d["type"] = "YouTube"
+    elif "nico" in d["url"]:
+      d["type"] = "ニコニコ動画"
+
     # サムネイル
     print(v[0].thumbnail)
     d["thumbnail"] = v[0].thumbnail

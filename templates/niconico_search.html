@@ -12,15 +12,42 @@
 
 <div class="content"> <!-- 最初は表示、マイリストに追加するときは非表示 -->
   <!-- 検索フォーム -->
-  <form method="POST">
+  <form method="GET">
     {% csrf_token %}
-    {{ form }}
-    <input type="submit" class="search_button" value="検索"></input>
+    <!-- {{ form }} -->
+    <input type="text" value="{{ request.GET.word }}" name="word" placeholder="キーワードを入力" class="search_inputtext"></input>
+    <button type="submit" class="search_button" value="検索">検索</button>
   </form>
 
   <!-- 並び替え -->
-  <div class="sort">
-    <p>関連度順</p>
+  <div class="dropdown">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ sort }}</button>
+    <ul class="dropdown-menu">
+      <form method="POST">
+        {% csrf_token %}
+        <!-- データを渡す -->
+        <input type="hidden" name="sort" value="再生回数の多い順" />
+        <li><button type="submit" class="dropdown-item" value="再生回数の多い順">再生回数の多い順</button></li>
+      </form>
+      <form method="POST">
+        {% csrf_token %}
+        <!-- データを渡す -->
+        <input type="hidden" name="sort" value="マイリスト数・お気に入り数が多い順" />
+        <li><button type="submit" class="dropdown-item" value="マイリスト数・お気に入り数が多い順">マイリスト数・お気に入り数が多い順</button></li>
+      </form>
+      <form method="POST">
+        {% csrf_token %}
+        <!-- データを渡す -->
+        <input type="hidden" name="sort" value="投稿日時が新しい順" />
+        <li><button type="submit" class="dropdown-item" value="投稿日時が新しい順">投稿日時が新しい順</button></li>
+      </form>
+      <form method="POST">
+        {% csrf_token %}
+        <!-- データを渡す -->
+        <input type="hidden" name="sort" value="コメント数の多い順" />
+        <li><button type="submit" class="dropdown-item" value="コメント数の多い順">コメント数の多い順</button></li>
+      </form>
+    </ul>
   </div>
 
   <!-- ページのリンクを表示する -->
@@ -29,7 +56,7 @@
     <ul class="pagination">
       {% if result.has_previous %} <!-- 前のページがあるとき -->
         <li class="page-item">
-          <a class="page-link" href="?q={{ word }}&page={{ result.previous_page_number }}">Previous</a>
+          <a class="page-link" href="?word={{ word }}&page={{ result.previous_page_number }}">Previous</a>
         </li>
       {% else %}
         <li class="page-item disabled"> <!-- 前のページがないとき -->
@@ -44,13 +71,13 @@
           </li>
         {% else %} <!-- 現在のページ以外 -->
           <li class="page-item">
-            <a class="page-link" href="?q={{ word }}&page={{ i }}">{{ i }}</a>
+            <a class="page-link" href="?word={{ word }}&page={{ i }}">{{ i }}</a>
           </li>
         {% endif %}
       {% endfor %}
       {% if result.has_next %} <!-- 次のページがあるとき -->
         <li class="page-item">
-          <a class="page-link" href="?q={{ word }}&page={{ result.next_page_number }}">Next</a>
+          <a class="page-link" href="?word={{ word }}&page={{ result.next_page_number }}">Next</a>
         </li>
       {% else %} <!-- 次のページがないとき -->
         <li class="page-item disabled">
@@ -95,7 +122,7 @@
     <ul class="pagination">
       {% if result.has_previous %} <!-- 前のページがあるとき -->
         <li class="page-item">
-          <a class="page-link" href="?q={{ word }}&page={{ result.previous_page_number }}">Previous</a>
+          <a class="page-link" href="?word={{ word }}&page={{ result.previous_page_number }}">Previous</a>
         </li>
       {% else %}
         <li class="page-item disabled"> <!-- 前のページがないとき -->
@@ -110,13 +137,13 @@
           </li>
         {% else %} <!-- 現在のページ以外 -->
           <li class="page-item">
-            <a class="page-link" href="?q={{ word }}&page={{ i }}">{{ i }}</a>
+            <a class="page-link" href="?word={{ word }}&page={{ i }}">{{ i }}</a>
           </li>
         {% endif %}
       {% endfor %}
       {% if result.has_next %} <!-- 次のページがあるとき -->
         <li class="page-item">
-          <a class="page-link" href="?q={{ word }}&page={{ result.next_page_number }}">Next</a>
+          <a class="page-link" href="?word={{ word }}&page={{ result.next_page_number }}">Next</a>
         </li>
       {% else %} <!-- 次のページがないとき -->
         <li class="page-item disabled">
