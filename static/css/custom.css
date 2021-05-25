@@ -186,3 +186,13 @@
 .category_checkbox {
   margin-bottom: 20px;
 }
+
+.pagination { /* 検索画面での、各ページへのリンク */
+  /* 上, 右, 下, 左 */
+  margin: 20px 100px 20px auto; /* 右寄せ */
+  width: 220px;
+}
+
+.dropdown { /* 検索画面での、並び替え */
+  padding-top: 20px;
+}

@@ -11,6 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 import ast
 from .constant import * # constant.pyからkeyを読み込む
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # youtube API
 from apiclient.discovery import build
@@ -26,70 +27,100 @@ def topfunc(request):
 
 # youtube --------------------------------------------------------------------------
 def youtube_searchfunc(request):
-  params = {'word': '', 'form': None, 'result': []}
-  if request.method == 'POST': # フォームが送信されたとき
-    is_exist_word = request.POST.get('word', False)
-    if is_exist_word != False: # 「検索」ボタンが押されたとき
-      # 検索キーワードを受け取って検索する
-      # keyに対応するvalueがあるかどうかでformのPOST処理を分ける
-      form = SearchForm(request.POST)
-      params['word'] = request.POST['word']
-      params['form'] = form
-      word = request.POST['word'] # 検索キーワード
-
-      # 検索する
-      youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
+  def searchfunc(word, sort): # 検索する関数
+    youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
           developerKey=DEVELOPER_KEY)
 
-      search_response = youtube.search().list(
-          q=word, # 検索キーワード
-          part="id,snippet",
-          maxResults=25,
-        ).execute()
+    search_response = youtube.search().list(
+        q=word, # 検索キーワード
+        part="id,snippet",
+        maxResults=50, # 取得する動画の数
+        # order="relevance" # order: 並び替える基準
+        order=sort # order: 並び替える基準
+      ).execute()
 
-      videos = []
-      channels = []
-      playlists = []
+    videos = []
+    channels = []
+    playlists = []
 
-      i = 0
-      for search_result in search_response.get("items", []):
-          if i < 2: # テスト
-            print(search_result)
-            # print(search_result["snippet"]["channelTitle"]) # チャンネル名
-            # print(search_result["id"]["videoId"]) # id
-            # idから再生回数を取得する
-            # id = search_result["id"]["videoId"]
-            # statistics = youtube.videos().list(part = 'statistics', id = id).execute()['items'][0]['statistics']
-            # print(statistics)
-          i += 1
-          if search_result["id"]["kind"] == "youtube#video":
-            videos.append("%s (%s)" % (search_result["snippet"]["title"],
-                                      search_result["id"]["videoId"]))
-            # 辞書型
-            d = {}
-            # 動画のタイトル
-            d['title'] = search_result["snippet"]["title"]
-            # params['result'].append(search_result["snippet"]["title"])
-            # 動画のURL
-            d['url'] = "https://www.youtube.com/watch?v=" + search_result["id"]["videoId"]
-            # params['result'].append("https://www.youtube.com/watch?v=" + search_result["id"]["videoId"])
-            # サムネイルの画像のURL
-            d['thumbnail'] = search_result["snippet"]["thumbnails"]["default"]["url"]
-            # チャンネル名
-            d['channelTitle'] = search_result["snippet"]["channelTitle"]
-            # idから再生回数を取得する
-            id = search_result["id"]["videoId"]
-            viewCount = youtube.videos().list(part = 'statistics', id = id).execute()['items'][0]['statistics']
-            d['viewCount'] = viewCount["viewCount"]
+    i = 0
+    for search_result in search_response.get("items", []):
+        # if i < 2: # テスト
+        #   print(search_result)
+        i += 1
+        if search_result["id"]["kind"] == "youtube#video":
+          videos.append("%s (%s)" % (search_result["snippet"]["title"],
+                                    search_result["id"]["videoId"]))
+          # 辞書型
+          d = {}
+          # 動画のタイトル
+          d['title'] = search_result["snippet"]["title"]
+          # params['result'].append(search_result["snippet"]["title"])
+          # 動画のURL
+          d['url'] = "https://www.youtube.com/watch?v=" + search_result["id"]["videoId"]
+          # params['result'].append("https://www.youtube.com/watch?v=" + search_result["id"]["videoId"])
+          # サムネイルの画像のURL
+          d['thumbnail'] = search_result["snippet"]["thumbnails"]["default"]["url"]
+          # チャンネル名
+          d['channelTitle'] = search_result["snippet"]["channelTitle"]
+          # idから再生回数を取得する
+          id = search_result["id"]["videoId"]
+          viewCount = youtube.videos().list(part = 'statistics', id = id).execute()['items'][0]['statistics']
+          # print("viewCount: ")
+          # print(viewCount)
+          d['viewCount'] = viewCount["viewCount"]
 
-            params['result'].append(d)
+          params['result'].append(d) # 検索結果を保存する -----------
 
-          elif search_result["id"]["kind"] == "youtube#channel":
-            channels.append("%s (%s)" % (search_result["snippet"]["title"],
-                                        search_result["id"]["channelId"]))
-          elif search_result["id"]["kind"] == "youtube#playlist":
-            playlists.append("%s (%s)" % (search_result["snippet"]["title"],
-                                          search_result["id"]["playlistId"]))
+        elif search_result["id"]["kind"] == "youtube#channel":
+          channels.append("%s (%s)" % (search_result["snippet"]["title"],
+                                      search_result["id"]["channelId"]))
+        elif search_result["id"]["kind"] == "youtube#playlist":
+          playlists.append("%s (%s)" % (search_result["snippet"]["title"],
+                                        search_result["id"]["playlistId"]))
+
+  params = { # 渡すデータ
+    'word': '',
+    'form': None,
+    'result': [],
+    'sort': '関連性が高い順'
+  }
+
+  if request.method == 'POST': # フォームが送信されたとき
+    # 並び替えのボタン(関連性が高い順など)が押されたとき
+    if request.POST.get('sort', False) != False:
+      print(request.POST['sort'])
+      print(request.GET['word'])
+      print(request.GET['page'])
+      sort = request.POST['sort']
+      word = request.GET['word']
+      params['sort'] = sort # テキストを変更する
+
+      # 指定された条件で検索する -------------------
+      if sort == '関連性が高い順':
+        print('sort_relevance')
+        searchfunc(word, 'relevance') # 検索する
+      elif sort == '投稿日時が新しい順':
+        print('sort_date')
+        searchfunc(word, 'date') # 検索する
+      elif sort == '評価の高い順':
+        print('sort_rating')
+        searchfunc(word, 'rating') # 検索する
+      elif sort == '再生回数の多い順':
+        print('viewCount')
+        searchfunc(word, 'viewCount') # 検索する
+
+      # ページング処理 -----------
+      page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
+      # 1ページに表示するデータ数を指定する
+      paginator = Paginator(params['result'], 10)
+      try:
+        results = paginator.page(page)
+      except PageNotAnInteger:
+        results = paginator.page(1)
+      except EmptyPage:
+        results = paginator.page(paginator.num_pages)
+      params['result'] = results
 
     # 「マイリストに追加」ボタンが押されたとき、mylist_add.htmlに遷移する
     elif request.POST.get('title', False) != False:
@@ -107,13 +138,67 @@ def youtube_searchfunc(request):
 
     params['form'] = SearchForm()
 
-  else: # request.method == 'GET'(最初に関数が呼ばれたとき)
+  elif request.method == 'GET':
     params['form'] = SearchForm()
+    print("get-------")
+
+    is_exist_word = request.GET.get('word', False)
+    if is_exist_word != False: # 「検索」ボタンが押されたとき、ページ番号が異なるページから遷移したとき
+      print("検索")
+      print(is_exist_word)
+      # 検索キーワードを受け取って検索する
+      # keyに対応するvalueがあるかどうかでformのPOST処理を分ける
+      form = SearchForm(request.POST)
+      params['word'] = request.GET['word']
+      params['form'] = form
+      word = request.GET['word'] # 検索キーワード
+
+      # 検索する
+      searchfunc(word, 'relevance')
+
+      # ページング処理 -----------
+      page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
+      # 1ページに表示するデータ数を指定する
+      paginator = Paginator(params['result'], 10)
+      try:
+        results = paginator.page(page)
+      except PageNotAnInteger:
+        results = paginator.page(1)
+      except EmptyPage:
+        results = paginator.page(paginator.num_pages)
+      params['result'] = results
 
   return render(request, 'youtube_search.html', params)
 
 # niconico --------------------------------------------------------------------------
 def niconico_searchfunc(request):
+  def searchfunc(word): # 検索する関数
+    REQUEST_URL = "https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search"
+
+    # クエリ文字列仕様
+    query = {
+        'q':word,
+        'targets':'title,tags',
+        'fields':'contentId,title,viewCounter,thumbnailUrl,description',
+        '_sort':'viewCounter',
+        '_context':'nico_jsonFilter',
+        '_limit':50, # 取得する動画の数
+        # 'jsonFilter':jsonFilter # 条件を絞る
+    }
+
+    # データを取得する
+    responses = requests.get(REQUEST_URL, query).json()
+
+    print(responses)
+
+    for i in range(len(responses['data'])):
+      d = {} # 辞書型
+      d['title'] = responses['data'][i]['title']
+      d['viewCounter'] = responses['data'][i]['viewCounter']
+      d['thumbnail'] = responses['data'][i]['thumbnailUrl']
+      d['url'] = "https://nico.ms/" + responses['data'][i]['contentId']
+      params['result'].append(d)
+
   params = {'word': '', 'form': None, 'result': []}
   if request.method == 'POST': # フォームが送信されたとき
     is_exist_word = request.POST.get('word', False)
@@ -124,50 +209,45 @@ def niconico_searchfunc(request):
       word = request.POST['word'] # 検索キーワード
 
       # 検索する
-      REQUEST_URL = "https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search"
+      searchfunc(word)
 
-      # JSONフィルタ指定仕様
-      jsonFilter = """{
-        "type": "or",
-        "filters": [
-          {
-            "type": "range",
-            "field": "startTime",
-            "from": "2017-07-07T00:00:00+09:00",
-            "to": "2017-07-08T00:00:00+09:00",
-            "include_upper": false
-          },
-          {
-            "type": "range",
-            "field": "startTime",
-            "from": "2016-07-07T00:00:00+09:00",
-            "to": "2016-07-08T00:00:00+09:00",
-            "include_upper": false
-          }
-        ]
-      }"""
+      # ページング処理 -----------
+      page = request.GET.get('page', 1) # 現在のページ数を指定する
+      # 1ページに表示するデータ数を指定する
+      paginator = Paginator(params['result'], 10)
+      try:
+        results = paginator.page(page)
+      except PageNotAnInteger:
+        results = paginator.page(1)
+      except EmptyPage:
+        results = paginator.page(paginator.num_pages)
+      params['result'] = results
 
-      # クエリ文字列仕様
-      query = {
-          'q':word,
-          'targets':'title,tags',
-          'fields':'contentId,title,viewCounter,thumbnailUrl',
-          '_sort':'viewCounter',
-          '_context':'nico_jsonFilter',
-          '_limit':10,
-          # 'jsonFilter':jsonFilter # 条件を絞る
-      }
+      # REQUEST_URL = "https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search"
 
-      # データを取得する
-      responses = requests.get(REQUEST_URL, query).json()
+      # # クエリ文字列仕様
+      # query = {
+      #     'q':word,
+      #     'targets':'title,tags',
+      #     'fields':'contentId,title,viewCounter,thumbnailUrl,description',
+      #     '_sort':'viewCounter',
+      #     '_context':'nico_jsonFilter',
+      #     '_limit':10,
+      #     # 'jsonFilter':jsonFilter # 条件を絞る
+      # }
 
-      for i in range(len(responses['data'])):
-        d = {} # 辞書型
-        d['title'] = responses['data'][i]['title']
-        d['viewCounter'] = responses['data'][i]['viewCounter']
-        d['thumbnail'] = responses['data'][i]['thumbnailUrl']
-        d['url'] = "https://nico.ms/" + responses['data'][i]['contentId']
-        params['result'].append(d)
+      # # データを取得する
+      # responses = requests.get(REQUEST_URL, query).json()
+
+      # print(responses)
+
+      # for i in range(len(responses['data'])):
+      #   d = {} # 辞書型
+      #   d['title'] = responses['data'][i]['title']
+      #   d['viewCounter'] = responses['data'][i]['viewCounter']
+      #   d['thumbnail'] = responses['data'][i]['thumbnailUrl']
+      #   d['url'] = "https://nico.ms/" + responses['data'][i]['contentId']
+      #   params['result'].append(d)
 
     # 「マイリストに追加」ボタンが押されたとき、mylist_add.htmlに遷移する
     elif request.POST.get('title', False) != False:
@@ -180,12 +260,33 @@ def niconico_searchfunc(request):
       d['thumbnail'] = request.POST['thumbnail']
       # d['categories'] = VideoCategory.objects.all # カテゴリ一覧
       d['categories'] = VideoCategory.objects.filter(user=request.user).distinct()
+
       return render(request, 'mylist_add.html', d)
 
     params['form'] = SearchForm()
   
   else: # 最初に関数が呼ばれたとき
     params['form'] = SearchForm()
+    print("get-------")
+    if 'q' in request.GET: # 他のページから遷移したとき
+      # URLから検索ワードを取得する
+      word = request.GET.get('q') # 検索キーワード
+      print(word)
+      params['word'] = word
+      # 検索する
+      searchfunc(word)
+      # ページング処理 -----------
+      page = request.GET.get('page', int(request.GET.get('page'))) # 現在のページ数を指定する
+      # 1ページに表示するデータ数を指定する
+      paginator = Paginator(params['result'], 10)
+      try:
+        results = paginator.page(page)
+      except PageNotAnInteger:
+        results = paginator.page(1)
+      except EmptyPage:
+        results = paginator.page(paginator.num_pages)
+      params['result'] = results
+
   return render(request, 'niconico_search.html', params)
 
 # マイリスト(カテゴリ一覧)
