@@ -1,15 +1,24 @@
 {% extends "base.html" %} 
-
+{% load static %}
 {% block content %}
 
 <h1 class="title">マイリスト</h1>
+
+<div class="content">
+  {% if categories %}
+    <button id="edit_button" onclick="edit()">編集</button>
+  {% endif %}
+
+  <button id="back_button" onclick="back()">戻る</button>
+</div>
+
 <div id="mylist">
   <!-- <p class="category_list">カテゴリ一覧</p> -->
   <ul>
-    {% for category in categories %}
+    {% for i in categories %}
       <li class="category">
-        <a href="{% url 'mylist_category' category %}" class="link">
-          {{ category }}
+        <a href="{% url 'mylist_category' i %}" class="link">
+          {{ i }}
         </a>
       </li>
     {% endfor %}
@@ -24,4 +33,28 @@
   </div>
 </div>
 
+<div class="content">
+  <!-- 動画を選択して削除する -->
+  <div id="select_mylist_delete">
+    <form method="post">
+      {% csrf_token %}
+      {% for i in categories %}
+        <div class="category">
+          <p>
+            <!-- チェックボックス -->
+            <input type="checkbox" name="check_delete" id="{{ i.id }}" value="{{ i }}">
+            {{ i }}<br>
+          </p>
+        </div>
+      {% endfor %}
+      <!-- カテゴリ名を渡す -->
+      <input type="hidden" name="category_name" value="{{ pk }}" />
+      <button type="submit" class="delete_button">選択したカテゴリを削除する</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block customjs %}
+<script type="text/javascript" src="{% static 'js/mylist_category.js' %}"></script>
 {% endblock %}

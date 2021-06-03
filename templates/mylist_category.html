@@ -1,16 +1,17 @@
 {% extends "base.html" %} 
+{% load static %}
 
 {% block content %}
 
 <div class="content">
-<p>カテゴリ : {{ pk }}</p>
-<a href="{% url 'mylist' %}">カテゴリ一覧に戻る</a><br>
+  <p>カテゴリ : {{ pk }}</p>
+  <a href="{% url 'mylist' %}">カテゴリ一覧に戻る</a><br>
 
-{% if video_info %}
-<button id="edit_button" onclick="edit()">編集</button>
-{% endif %}
+  {% if video_info %}
+  <button id="edit_button" onclick="edit()">編集</button>
+  {% endif %}
 
-<button id="back_button" onclick="back()">戻る</button>
+  <button id="back_button" onclick="back()">戻る</button>
 
   <!-- 動画を表示する -->
   <div id="mylist">
@@ -33,7 +34,7 @@
         <div class="box">
           <p>
             <!-- チェックボックス -->
-            <input type="checkbox" name="check_delete" id="{{ i.recipeId }}" value="{{ i }}">
+            <input type="checkbox" name="check_delete" id="{{ i.id }}" value="{{ i }}">
             {{ i.title }}<br>
             <img src="{{ i.thumbnail }}" /><br>
           </p>
@@ -46,4 +47,7 @@
   </div>
 </div>
 
+{% endblock %}
+{% block customjs %}
+<script type="text/javascript" src="{% static 'js/mylist_category.js' %}"></script>
 {% endblock %}
