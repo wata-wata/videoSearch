@@ -123,7 +123,7 @@ def youtube_searchfunc(request):
           # ページング処理 -----------
           page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
           # 1ページに表示するデータ数を指定する
-          paginator = Paginator(params['result'], 5)
+          paginator = Paginator(params['result'], 10)
           try:
             results = paginator.page(page)
           except PageNotAnInteger:
@@ -181,7 +181,7 @@ def youtube_searchfunc(request):
       # ページング処理 -----------
       page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
       # 1ページに表示するデータ数を指定する
-      paginator = Paginator(params['result'], 5)
+      paginator = Paginator(params['result'], 10)
       try:
         results = paginator.page(page)
       except PageNotAnInteger:
@@ -261,7 +261,7 @@ def niconico_searchfunc(request):
         # ページング処理 -----------
         page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
         # 1ページに表示するデータ数を指定する
-        paginator = Paginator(params['result'], 5)
+        paginator = Paginator(params['result'], 10)
         try:
           results = paginator.page(page)
         except PageNotAnInteger:
@@ -322,7 +322,7 @@ def niconico_searchfunc(request):
       # ページング処理 -----------
       page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
       # 1ページに表示するデータ数を指定する
-      paginator = Paginator(params['result'], 5)
+      paginator = Paginator(params['result'], 10)
       try:
         results = paginator.page(page)
       except PageNotAnInteger:
