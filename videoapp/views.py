@@ -156,6 +156,8 @@ def youtube_searchfunc(request):
     if is_exist_word != False: # 「検索」ボタンが押されたとき、ページ番号が異なるページから遷移したとき
       print("検索")
       print(is_exist_word)
+      if request.GET.get('sort', False) != False:
+        params['sort'] = request.GET['sort'] # ---------------------------
       # 検索キーワードを受け取って検索する
       # keyに対応するvalueがあるかどうかでformのPOST処理を分ける
       form = SearchForm(request.POST)

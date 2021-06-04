@@ -16,6 +16,7 @@
     {% csrf_token %}
     <!-- {{ form }} -->
     <input type="text" value="{{ request.GET.word }}" name="word" placeholder="キーワードを入力" class="search_inputtext"></input>
+    <!-- <input type="text" value="{{ word }}" name="word" placeholder="キーワードを入力" class="search_inputtext"></input> -->
     <input type="hidden" value="1" name="page" />
     <button type="submit" class="search_button" value="検索">検索</button>
   </form>
@@ -57,7 +58,7 @@
     <ul class="pagination">
       {% if result.has_previous %} <!-- 前のページがあるとき -->
         <li class="page-item">
-          <a class="page-link" href="?q={{ word }}&page={{ result.previous_page_number }}">Previous</a>
+          <a class="page-link" href="?q={{ request.GET.word }}&page={{ result.previous_page_number }}&sort={{ sort }}">Previous</a>
         </li>
       {% else %}
         <li class="page-item disabled"> <!-- 前のページがないとき -->
@@ -72,13 +73,13 @@
           </li>
         {% else %} <!-- 現在のページ以外 -->
           <li class="page-item">
-            <a class="page-link" href="?word={{ word }}&page={{ i }}">{{ i }}</a>
+            <a class="page-link" href="?word={{ request.GET.word }}&page={{ i }}&sort={{ sort }}">{{ i }}</a>
           </li>
         {% endif %}
       {% endfor %}
       {% if result.has_next %} <!-- 次のページがあるとき -->
         <li class="page-item">
-          <a class="page-link" href="?word={{ word }}&page={{ result.next_page_number }}">Next</a>
+          <a class="page-link" href="?word={{ request.GET.word }}&page={{ result.next_page_number }}&sort={{ sort }}">Next</a>
         </li>
       {% else %} <!-- 次のページがないとき -->
         <li class="page-item disabled">
@@ -124,7 +125,7 @@
     <ul class="pagination">
       {% if result.has_previous %} <!-- 前のページがあるとき -->
         <li class="page-item">
-          <a class="page-link" href="?q={{ word }}&page={{ result.previous_page_number }}">Previous</a>
+          <a class="page-link" href="?q={{ request.GET.word }}&page={{ result.previous_page_number }}&sort={{ sort }}">Previous</a>
         </li>
       {% else %}
         <li class="page-item disabled"> <!-- 前のページがないとき -->
@@ -139,13 +140,13 @@
           </li>
         {% else %} <!-- 現在のページ以外 -->
           <li class="page-item">
-            <a class="page-link" href="?word={{ word }}&page={{ i }}">{{ i }}</a>
+            <a class="page-link" href="?word={{ request.GET.word }}&page={{ i }}&sort={{ sort }}">{{ i }}</a>
           </li>
         {% endif %}
       {% endfor %}
       {% if result.has_next %} <!-- 次のページがあるとき -->
         <li class="page-item">
-          <a class="page-link" href="?word={{ word }}&page={{ result.next_page_number }}">Next</a>
+          <a class="page-link" href="?word={{ request.GET.word }}&page={{ result.next_page_number }}&sort={{ sort }}">Next</a>
         </li>
       {% else %} <!-- 次のページがないとき -->
         <li class="page-item disabled">
