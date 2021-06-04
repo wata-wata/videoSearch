@@ -158,6 +158,8 @@ def youtube_searchfunc(request):
       print(is_exist_word)
       if request.GET.get('sort', False) != False:
         params['sort'] = request.GET['sort'] # ---------------------------
+      print(params['sort'])
+      print(type(params['sort']))
       # 検索キーワードを受け取って検索する
       # keyに対応するvalueがあるかどうかでformのPOST処理を分ける
       form = SearchForm(request.POST)
@@ -165,8 +167,16 @@ def youtube_searchfunc(request):
       params['form'] = form
       word = request.GET['word'] # 検索キーワード
 
-      # 検索する
-      searchfunc(word, 'relevance')
+      # 指定された条件で検索する -------------------
+      sort = params['sort']
+      if sort == '関連性が高い順':
+        searchfunc(word, 'relevance') # 検索する
+      elif sort == '投稿日時が新しい順':
+        searchfunc(word, 'date') # 検索する
+      elif sort == '評価の高い順':
+        searchfunc(word, 'rating') # 検索する
+      elif sort == '再生回数の多い順':
+        searchfunc(word, 'viewCount') # 検索する
 
       # ページング処理 -----------
       page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
@@ -202,7 +212,7 @@ def niconico_searchfunc(request):
     # データを取得する
     responses = requests.get(REQUEST_URL, query).json()
 
-    print(responses)
+    # print(responses)
 
     for i in range(len(responses['data'])):
       d = {} # 辞書型
@@ -227,9 +237,9 @@ def niconico_searchfunc(request):
         messages.error(request, "キーワードを入力してください")
       
       else: # 検索ワードが入っているとき
-        print(request.POST['sort'])
-        print(request.GET['word'])
-        print(request.GET['page'])
+        # print(request.POST['sort'])
+        # print(request.GET['word'])
+        # print(request.GET['page'])
         sort = request.POST['sort']
         word = request.GET['word']
         params['sort'] = sort # テキストを変更する
@@ -284,6 +294,9 @@ def niconico_searchfunc(request):
     if is_exist_word != False: # 「検索」ボタンが押されたとき、ページ番号が異なるページから遷移したとき
       print("検索")
       print(is_exist_word)
+      if request.GET.get('sort', False) != False:
+        params['sort'] = request.GET['sort']
+        print(params['sort'])
       # 検索キーワードを受け取って検索する
       # keyに対応するvalueがあるかどうかでformのPOST処理を分ける
       form = SearchForm(request.POST)
@@ -291,8 +304,20 @@ def niconico_searchfunc(request):
       params['form'] = form
       word = request.GET['word'] # 検索キーワード
 
-      # 検索する
-      searchfunc(word, 'viewCounter')
+      # 指定された条件で検索する -------------------
+      sort = params['sort']
+      if sort == '再生回数の多い順':
+        print('sort_viewCounter')
+        searchfunc(word, 'viewCounter') # 検索する
+      elif sort == 'マイリスト数・お気に入り数が多い順':
+        print('sort_mylistCounter')
+        searchfunc(word, 'mylistCounter') # 検索する
+      elif sort == '投稿日時が新しい順':
+        print('sort_startTime')
+        searchfunc(word, 'startTime') # 検索する
+      elif sort == 'コメント数の多い順':
+        print('sort_commentCounter')
+        searchfunc(word, 'commentCounter') # 検索する
 
       # ページング処理 -----------
       page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
