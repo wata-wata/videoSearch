@@ -34,7 +34,7 @@ def youtube_searchfunc(request):
     search_response = youtube.search().list(
         q=word, # 検索キーワード
         part="id,snippet",
-        maxResults=10, # 取得する動画の数
+        maxResults=50, # 取得する動画の数
         # order="relevance" # order: 並び替える基準
         order=sort # order: 並び替える基準
       ).execute()
@@ -123,7 +123,7 @@ def youtube_searchfunc(request):
           # ページング処理 -----------
           page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
           # 1ページに表示するデータ数を指定する
-          paginator = Paginator(params['result'], 3)
+          paginator = Paginator(params['result'], 5)
           try:
             results = paginator.page(page)
           except PageNotAnInteger:
@@ -181,7 +181,7 @@ def youtube_searchfunc(request):
       # ページング処理 -----------
       page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
       # 1ページに表示するデータ数を指定する
-      paginator = Paginator(params['result'], 3)
+      paginator = Paginator(params['result'], 5)
       try:
         results = paginator.page(page)
       except PageNotAnInteger:
@@ -205,7 +205,7 @@ def niconico_searchfunc(request):
         '_sort':sort,
         '_context':'nico_jsonFilter',
         # '_limit':50, # 取得する動画の数
-        '_limit':10,
+        '_limit':50,
         # 'jsonFilter':jsonFilter # 条件を絞る
     }
 
@@ -261,7 +261,7 @@ def niconico_searchfunc(request):
         # ページング処理 -----------
         page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
         # 1ページに表示するデータ数を指定する
-        paginator = Paginator(params['result'], 3)
+        paginator = Paginator(params['result'], 5)
         try:
           results = paginator.page(page)
         except PageNotAnInteger:
@@ -322,7 +322,7 @@ def niconico_searchfunc(request):
       # ページング処理 -----------
       page = request.GET.get('page', 1) # 現在のページ数を取得する(なければ1)
       # 1ページに表示するデータ数を指定する
-      paginator = Paginator(params['result'], 3)
+      paginator = Paginator(params['result'], 5)
       try:
         results = paginator.page(page)
       except PageNotAnInteger:
