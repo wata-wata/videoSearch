@@ -189,7 +189,7 @@
 
 .pagination { /* 検索画面での、各ページへのリンク */
   /* 上, 右, 下, 左 */
-  margin: 20px 100px 20px auto; /* 右寄せ */
+  margin: 20px 300px 20px auto; /* 右寄せ */
   width: 220px;
 }
 
