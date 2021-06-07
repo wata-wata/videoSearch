@@ -11,9 +11,9 @@ urlpatterns = [
   path("siteUser/register/", SiteUserRegisterView.as_view(), name="site_user_register"),
   path("siteUser/profile/", SiteUserProfileView.as_view(), name="site_user_profile"),
   # ニコニコ
-  path("niconico_search/", niconico_searchfunc, name='niconico_search'),
+  path("niconico_search/", niconico_searchfunc, name="niconico_search"),
   # youtube検索
-  path("youtube_search/", youtube_searchfunc, name='youtube_search'),
+  path("youtube_search/", youtube_searchfunc, name="youtube_search"),
   # マイリスト(カテゴリ一覧)
   path("mylist/", mylistfunc, name="mylist"),
   # マイリスト(カテゴリ別)

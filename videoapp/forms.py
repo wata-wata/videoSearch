@@ -14,8 +14,8 @@ class MyVideo(forms.ModelForm):
     class Meta:
         model = Video
         # 使用するフィールド
-        # fields = ('title', 'url', 'thumbnail')
-        fields = ('url', 'category')
+        # fields = ("title", "url", "thumbnail")
+        fields = ("url", "category")
 
     def __init__(self, user, *args, **kwargs):
         self.user = user

@@ -22,10 +22,3 @@ function back() {
   mylist.style.display = "block"; // 選択部分を表示する
   mylist_delete.style.display = "none"; // 検索結果を非表示にする
 }
-
-// $(function(){
-//   $('.dropdown-menu .dropdown-item').click(function(){
-//       var visibleItem = $('.dropdown-toggle', $(this).closest('.dropdown'));
-//       visibleItem.text($(this).attr('value'));
-//   });
-// });
