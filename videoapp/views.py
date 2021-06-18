@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 import ast
 from .constant import * # constant.pyからkeyを読み込む
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-import os
+# import os
 
 # youtube API
 from apiclient.discovery import build
