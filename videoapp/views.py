@@ -1,3 +1,4 @@
+from videoapp.constant import DEVELOPER_KEY
 from videoapp.models import *
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, QueryDict
@@ -10,8 +11,9 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 import ast
-from .constant import * # constant.pyからkeyを読み込む
+# from .constant import * # constant.pyからkeyを読み込む
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import os
 
 # youtube API
 from apiclient.discovery import build
@@ -20,6 +22,8 @@ from oauth2client.tools import argparser
 # DEVELOPER_KEY = DEVELOPER_KEY
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
+
+DEVELOPER_KEY = os.environ['youtube_key']
 
 # トップページ
 def topfunc(request):
