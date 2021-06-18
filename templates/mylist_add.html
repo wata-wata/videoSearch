@@ -4,9 +4,6 @@
 {% endblock customcss %}
 
 {% block header %}
-<!-- <div class="alert alert-primary" role="alert">
-    youtube
-</div> -->
 {% endblock header %}
 
 {% block content %}
@@ -26,8 +23,10 @@
       {% for category in categories %}
         <!-- カテゴリを表示する -->
         <p>
-          <input type="checkbox" id="{{ category }}" name="{{ category }}" />
-          {{ category }} 
+          <label>
+            <input type="checkbox" id="{{ category }}" name="{{ category }}" />
+            {{ category }} 
+          </label>
         </p>
       {% endfor %}
 

@@ -33,10 +33,12 @@
       {% for i in video_info %}
         <div class="box">
           <p>
-            <!-- チェックボックス -->
-            <input type="checkbox" name="check_delete" id="{{ i.id }}" value="{{ i }}">
-            {{ i.title }}<br>
-            <img src="{{ i.thumbnail }}" /><br>
+            <label>
+              <!-- チェックボックス -->
+              <input type="checkbox" name="check_delete" id="{{ i.id }}" value="{{ i }}" />
+              {{ i.title }}<br>
+              <img src="{{ i.thumbnail }}" /><br>
+            </label>
           </p>
         </div>
       {% endfor %}
@@ -49,5 +51,5 @@
 
 {% endblock %}
 {% block customjs %}
-<script type="text/javascript" src="{% static 'js/mylist_category.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/mylist.js' %}"></script>
 {% endblock %}

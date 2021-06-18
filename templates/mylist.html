@@ -13,7 +13,6 @@
 </div>
 
 <div id="mylist">
-  <!-- <p class="category_list">カテゴリ一覧</p> -->
   <ul>
     {% for i in categories %}
       <li class="category">
@@ -41,9 +40,10 @@
       {% for i in categories %}
         <div class="category">
           <p>
-            <!-- チェックボックス -->
-            <input type="checkbox" name="check_delete" id="{{ i.id }}" value="{{ i }}">
-            {{ i }}<br>
+            <label>
+              <input type="checkbox" name="check_delete" id="{{ i.id }}" value="{{ i }}" />
+              {{ i }}
+            </label>
           </p>
         </div>
       {% endfor %}
@@ -56,5 +56,5 @@
 {% endblock %}
 
 {% block customjs %}
-<script type="text/javascript" src="{% static 'js/mylist_category.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/mylist.js' %}"></script>
 {% endblock %}
