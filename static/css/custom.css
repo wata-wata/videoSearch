@@ -196,3 +196,7 @@
 .dropdown { /* 検索画面での、並び替え */
   padding-top: 20px;
 }
+
+.thumbnail { /* 動画のサムネイル */
+  width: 150px;
+}

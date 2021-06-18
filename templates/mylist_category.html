@@ -20,7 +20,7 @@
         <a href="{{ i.url }}" target="_blank" rel="noopener noreferrer">
           {{ i.title }}<br>
           {{ i.type }}<br>
-          <img src="{{ i.thumbnail }}" /><br>
+          <img src="{{ i.thumbnail }}" class="thumbnail" /><br>
         </a>
       </div>
     {% endfor %}
@@ -37,7 +37,8 @@
               <!-- チェックボックス -->
               <input type="checkbox" name="check_delete" id="{{ i.id }}" value="{{ i }}" />
               {{ i.title }}<br>
-              <img src="{{ i.thumbnail }}" /><br>
+              {{ i.type }}<br>
+              <img src="{{ i.thumbnail }}" class="thumbnail" /><br>
             </label>
           </p>
         </div>
