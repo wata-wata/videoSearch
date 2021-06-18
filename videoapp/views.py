@@ -11,7 +11,7 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 import ast
-# from .constant import * # constant.pyからkeyを読み込む
+from .constant import * # constant.pyからkeyを読み込む
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import os
 
@@ -19,11 +19,11 @@ import os
 from apiclient.discovery import build
 from apiclient.errors import HttpError
 from oauth2client.tools import argparser
-# DEVELOPER_KEY = DEVELOPER_KEY
+DEVELOPER_KEY = DEVELOPER_KEY
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
-DEVELOPER_KEY = os.environ['youtube_key']
+# DEVELOPER_KEY = os.environ['youtube_key']
 
 # トップページ
 def topfunc(request):
