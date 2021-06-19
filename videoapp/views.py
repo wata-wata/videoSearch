@@ -11,7 +11,6 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 import ast
-# from .constant import * # constant.pyからkeyを読み込む
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import os
 from os.path import join, dirname
