@@ -13,7 +13,13 @@
 
   .menu {
     width: 49%;
-  } 
+  }
+
+  .pagination { /* 検索画面での、各ページへのリンク */
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 150px;
+  }
 }
 
 @media screen and (max-width: 480px) { /* スマホ */
@@ -23,6 +29,12 @@
 
   .search_inputtext { /* 検索フォーム(文字入力) */
     width: 150px;
+  }
+
+  .pagination { /* 検索画面での、各ページへのリンク */
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 50px;
   }
 }
 
@@ -177,18 +189,6 @@
 
 .category_checkbox {
   margin-bottom: 20px;
-}
-
-.pagination { /* 検索画面での、各ページへのリンク */
-  /* 上, 右, 下, 左 */
-  /* margin: 20px 150px 20px auto;  */
-  /* margin: 20px 40px 20px auto; */
-  padding-top: 20px;
-  padding-bottom: 20px;
-  /* padding-right: 40px; */
-  padding-left: 150px;
-  /* width: 220px; */
-  width: 100px;
 }
 
 .dropdown { /* 検索画面での、並び替え */
