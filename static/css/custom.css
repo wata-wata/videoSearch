@@ -34,11 +34,7 @@
   .pagination { /* 検索画面での、各ページへのリンク */
     padding-top: 20px;
     padding-bottom: 20px;
-    padding-left: 50px;
-  }
-
-  .paging-navigationbar { /* 検索画面での、各ページへのリンク */
-    width: 100px;
+    padding-left: 0px;
   }
 }
 
@@ -61,8 +57,6 @@
 #mylist_result .article-mylist figure img {
   display: inline-block;
   border-radius: 5px;
-  /* height: 200px;
-  width: 250px; */
 }
 
 .category {
