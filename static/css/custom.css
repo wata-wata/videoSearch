@@ -7,10 +7,6 @@
     width: 200px;
   }
 
-  .search_button { /* 検索フォーム(検索ボタン) */
-    width: 80px;
-  }
-
   .side { /* 横並び */
     display: inline-block;
   }
@@ -27,10 +23,6 @@
 
   .search_inputtext { /* 検索フォーム(文字入力) */
     width: 150px;
-  }
-
-  .search_button { /* 検索フォーム(検索ボタン) */
-    width: 80px;
   }
 }
 
@@ -136,7 +128,7 @@
   color:#fff;
   background-color:#f66;
   border:1px solid #c66;
-  /* width: 80px; */
+  width: 80px;
 }
 
 .back_search { /* 「YouTube検索に戻る」「ニコニコ動画検索に戻る」 */
@@ -189,7 +181,8 @@
 
 .pagination { /* 検索画面での、各ページへのリンク */
   /* 上, 右, 下, 左 */
-  margin: 20px 150px 20px auto; 
+  /* margin: 20px 150px 20px auto;  */
+  margin: 20px 0px 20px auto;
   width: 220px;
 }
 
