@@ -1,4 +1,4 @@
-from videoapp.constant import DEVELOPER_KEY
+# from videoapp.constant import DEVELOPER_KEY
 from videoapp.models import *
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, QueryDict
