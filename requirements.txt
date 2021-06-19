@@ -55,6 +55,7 @@ PyQt5-sip==12.8.1
 pyquery==1.4.1
 PySocks==1.7.1
 python-dateutil==2.8.1
+python-dotenv==0.17.1
 python-twitter==3.5
 pytz==2020.1
 PyWavelets==1.1.1
