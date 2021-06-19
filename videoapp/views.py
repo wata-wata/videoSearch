@@ -35,7 +35,7 @@ def topfunc(request):
 def youtube_searchfunc(request):
   def searchfunc(word, sort): # 検索する関数
     # APIキーの取得
-    load_dotenv('.env')
+    # load_dotenv('.env') # localのみ
     DEVELOPER_KEY = os.environ.get("youtube_key")
     print("youtube_key: ", end="")
     print(DEVELOPER_KEY)
