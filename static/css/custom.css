@@ -182,7 +182,10 @@
 .pagination { /* 検索画面での、各ページへのリンク */
   /* 上, 右, 下, 左 */
   /* margin: 20px 150px 20px auto;  */
-  margin: 20px 40px 20px auto;
+  /* margin: 20px 40px 20px auto; */
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-right: 40px;
   width: 220px;
 }
 
