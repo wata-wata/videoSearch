@@ -36,8 +36,8 @@ def youtube_searchfunc(request):
     # APIキーの取得
     # load_dotenv('.env') # localのみ
 
-    # DEVELOPER_KEY = os.environ.get("youtube_key") # 本番環境
-    DEVELOPER_KEY = "AIzaSyCOwWr4PdibRXda37LqgeM_AabPwBgEcZY" # ローカル
+    DEVELOPER_KEY = os.environ.get("youtube_key") # 本番環境
+    # DEVELOPER_KEY = "AIzaSyCOwWr4PdibRXda37LqgeM_AabPwBgEcZY" # ローカル
     print("youtube_key: ", end="")
     print(DEVELOPER_KEY)
 
