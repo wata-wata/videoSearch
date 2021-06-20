@@ -37,7 +37,7 @@ def youtube_searchfunc(request):
     # load_dotenv('.env') # localのみ
 
     DEVELOPER_KEY = os.environ.get("youtube_key") # 本番環境
-    # DEVELOPER_KEY = "AIzaSyCOwWr4PdibRXda37LqgeM_AabPwBgEcZY" # ローカル
+    DEVELOPER_KEY = "AIzaSyCOwWr4PdibRXda37LqgeM_AabPwBgEcZY" # ローカル
     print("youtube_key: ", end="")
     print(DEVELOPER_KEY)
 
@@ -112,9 +112,9 @@ def youtube_searchfunc(request):
   if request.method == "POST": # フォームが送信されたとき
     # 並び替えのボタン(関連性が高い順など)が押されたとき
     if request.POST.get("sort", False) != False:
-      # if request.GET.get('word', False) == False: # 検索ワードが入っていないとき
-      #   # エラー処理
-      #   messages.error(request, "キーワードを入力してください")
+      if request.GET.get('word', False) == False: # 検索ワードが入っていないとき
+        # エラー処理
+        messages.error(request, "キーワードを入力してください")
 
       # else: # 検索ワードが入っているとき
       if request.GET.get("word", False) != False: # 検索されたとき
@@ -181,60 +181,66 @@ def youtube_searchfunc(request):
     if is_exist_word != False: # 「検索」ボタンが押されたとき、ページ番号が異なるページから遷移したとき
       print("検索")
       print(is_exist_word)
-      # ページ遷移の場合は、params["sort"]を更新する
-      # 「検索」ボタンが押された場合は、関連性が高い順に検索する
-      if request.GET.get("sort", False) != False: # ページ遷移の場合
-        params["sort"] = request.GET["sort"]
-        # モデルからデータを取得する
-        results = SearchResult.objects.filter(user=request.user)
-        
-        for result in results:
-          d = {}
-          # title, url, thumbnail, viewCount
-          d["title"] = result.title
-          d["url"] = result.url
-          d["thumbnail"] = result.thumbnail
-          d["viewCount"] = result.viewCount
 
-          params["result"].append(d)
-          # print("result:", end="")
-          # print(result)
-          # print(result.url)
+      if request.GET["word"] == "": # 検索ワードが入っていないとき
+        # エラー処理
+        messages.error(request, "キーワードを入力してください")
 
       else:
-        print(params["sort"])
-        print(type(params["sort"]))
-        # 検索キーワードを受け取って検索する
-        form = SearchForm(request.POST)
-        params["word"] = request.GET["word"]
-        params["form"] = form
-        word = request.GET["word"] # 検索キーワード
+        # ページ遷移の場合は、params["sort"]を更新する
+        # 「検索」ボタンが押された場合は、関連性が高い順に検索する
+        if request.GET.get("sort", False) != False: # ページ遷移の場合
+          params["sort"] = request.GET["sort"]
+          # モデルからデータを取得する
+          results = SearchResult.objects.filter(user=request.user)
+          
+          for result in results:
+            d = {}
+            # title, url, thumbnail, viewCount
+            d["title"] = result.title
+            d["url"] = result.url
+            d["thumbnail"] = result.thumbnail
+            d["viewCount"] = result.viewCount
 
-        # 指定された条件で検索する -------------------
-        sort = params["sort"]
-        print("params['sort':]")
-        print(params["sort"])
-        print(params["result"])
-        if sort == "関連性が高い順":
-          searchfunc(word, "relevance") # 検索する
-        elif sort == "投稿日時が新しい順": # いらない?
-          searchfunc(word, "date") # 検索する
-        elif sort == "評価の高い順": # いらない?
-          searchfunc(word, "rating") # 検索する
-        elif sort == "再生回数の多い順": # いらない?
-          searchfunc(word, "viewCount") # 検索する
+            params["result"].append(d)
+            # print("result:", end="")
+            # print(result)
+            # print(result.url)
 
-      # ページング処理 -----------
-      page = request.GET.get("page", 1) # 現在のページ数を取得する(なければ1)
-      # 1ページに表示するデータ数を指定する
-      paginator = Paginator(params["result"], 3)
-      try:
-        results = paginator.page(page)
-      except PageNotAnInteger:
-        results = paginator.page(1)
-      except EmptyPage:
-        results = paginator.page(paginator.num_pages)
-      params["result"] = results
+        else:
+          print(params["sort"])
+          print(type(params["sort"]))
+          # 検索キーワードを受け取って検索する
+          form = SearchForm(request.POST)
+          params["word"] = request.GET["word"]
+          params["form"] = form
+          word = request.GET["word"] # 検索キーワード
+
+          # 指定された条件で検索する -------------------
+          sort = params["sort"]
+          print("params['sort':]")
+          print(params["sort"])
+          print(params["result"])
+          if sort == "関連性が高い順":
+            searchfunc(word, "relevance") # 検索する
+          elif sort == "投稿日時が新しい順": # いらない?
+            searchfunc(word, "date") # 検索する
+          elif sort == "評価の高い順": # いらない?
+            searchfunc(word, "rating") # 検索する
+          elif sort == "再生回数の多い順": # いらない?
+            searchfunc(word, "viewCount") # 検索する
+
+        # ページング処理 -----------
+        page = request.GET.get("page", 1) # 現在のページ数を取得する(なければ1)
+        # 1ページに表示するデータ数を指定する
+        paginator = Paginator(params["result"], 3)
+        try:
+          results = paginator.page(page)
+        except PageNotAnInteger:
+          results = paginator.page(1)
+        except EmptyPage:
+          results = paginator.page(paginator.num_pages)
+        params["result"] = results
 
   return render(request, "youtube_search.html", params)
 
@@ -293,40 +299,41 @@ def niconico_searchfunc(request):
         messages.error(request, "キーワードを入力してください")
       
       else: # 検索ワードが入っているとき
-        # print(request.POST["sort"])
-        # print(request.GET["word"])
-        # print(request.GET["page"])
-        sort = request.POST["sort"]
-        word = request.GET["word"]
-        params["sort"] = sort # テキストを変更する
+        if request.GET["word"] == "": # 検索ワードが入っていないとき
+          # エラー処理
+          messages.error(request, "キーワードを入力してください")
+        else:
+          sort = request.POST["sort"]
+          word = request.GET["word"]
+          params["sort"] = sort # テキストを変更する
 
-        # 指定された条件で検索する -------------------
-        if sort == "再生回数の多い順":
-          print("sort_viewCounter")
-          searchfunc(word, "viewCounter") # 検索する
-        elif sort == "マイリスト数・お気に入り数が多い順":
-          print("sort_mylistCounter")
-          searchfunc(word, "mylistCounter") # 検索する
-        elif sort == "投稿日時が新しい順":
-          print("sort_startTime")
-          searchfunc(word, "startTime") # 検索する
-        elif sort == "コメント数の多い順":
-          print("sort_commentCounter")
-          searchfunc(word, "commentCounter") # 検索する
+          # 指定された条件で検索する -------------------
+          if sort == "再生回数の多い順":
+            print("sort_viewCounter")
+            searchfunc(word, "viewCounter") # 検索する
+          elif sort == "マイリスト数・お気に入り数が多い順":
+            print("sort_mylistCounter")
+            searchfunc(word, "mylistCounter") # 検索する
+          elif sort == "投稿日時が新しい順":
+            print("sort_startTime")
+            searchfunc(word, "startTime") # 検索する
+          elif sort == "コメント数の多い順":
+            print("sort_commentCounter")
+            searchfunc(word, "commentCounter") # 検索する
 
-        # ページング処理 -----------
-        # page = request.GET.get("page", 1) # 現在のページ数を取得する(なければ1)
-        page = 1 # 1ページ目を表示するようにする --------
+          # ページング処理 -----------
+          # page = request.GET.get("page", 1) # 現在のページ数を取得する(なければ1)
+          page = 1 # 1ページ目を表示するようにする --------
 
-        # 1ページに表示するデータ数を指定する
-        paginator = Paginator(params["result"], 10)
-        try:
-          results = paginator.page(page)
-        except PageNotAnInteger:
-          results = paginator.page(1)
-        except EmptyPage:
-          results = paginator.page(paginator.num_pages)
-        params["result"] = results
+          # 1ページに表示するデータ数を指定する
+          paginator = Paginator(params["result"], 10)
+          try:
+            results = paginator.page(page)
+          except PageNotAnInteger:
+            results = paginator.page(1)
+          except EmptyPage:
+            results = paginator.page(paginator.num_pages)
+          params["result"] = results
 
     # 「マイリストに追加」ボタンが押されたとき、mylist_add.htmlに遷移する
     elif request.POST.get("title", False) != False:
@@ -352,55 +359,61 @@ def niconico_searchfunc(request):
     if is_exist_word != False: # 「検索」ボタンが押されたとき、ページ番号が異なるページから遷移したとき
       print("検索")
       print(is_exist_word)
-      if request.GET.get("sort", False) != False: # ページ遷移の場合
-        params["sort"] = request.GET["sort"]
-        # モデルからデータを取得する
-        results = SearchResult.objects.filter(user=request.user)
 
-        for result in results:
-          d = {}
-          # title, url, thumbnail, viewCount
-          d["title"] = result.title
-          d["url"] = result.url
-          d["thumbnail"] = result.thumbnail
-          d["viewCounter"] = result.viewCount
-
-          params["result"].append(d)
+      if request.GET["word"] == "": # 検索ワードが入っていないとき
+        # エラー処理
+        messages.error(request, "キーワードを入力してください")
 
       else:
-        # 検索キーワードを受け取って検索する
-        # keyに対応するvalueがあるかどうかでformのPOST処理を分ける
-        form = SearchForm(request.POST)
-        params["word"] = request.GET["word"]
-        params["form"] = form
-        word = request.GET["word"] # 検索キーワード
+        if request.GET.get("sort", False) != False: # ページ遷移の場合
+          params["sort"] = request.GET["sort"]
+          # モデルからデータを取得する
+          results = SearchResult.objects.filter(user=request.user)
 
-        # 指定された条件で検索する -------------------
-        sort = params["sort"]
-        if sort == "再生回数の多い順":
-          print("sort_viewCounter")
-          searchfunc(word, "viewCounter") # 検索する
-        elif sort == "マイリスト数・お気に入り数が多い順":
-          print("sort_mylistCounter")
-          searchfunc(word, "mylistCounter") # 検索する
-        elif sort == "投稿日時が新しい順":
-          print("sort_startTime")
-          searchfunc(word, "startTime") # 検索する
-        elif sort == "コメント数の多い順":
-          print("sort_commentCounter")
-          searchfunc(word, "commentCounter") # 検索する
+          for result in results:
+            d = {}
+            # title, url, thumbnail, viewCount
+            d["title"] = result.title
+            d["url"] = result.url
+            d["thumbnail"] = result.thumbnail
+            d["viewCounter"] = result.viewCount
 
-      # ページング処理 -----------
-      page = request.GET.get("page", 1) # 現在のページ数を取得する(なければ1)
-      # 1ページに表示するデータ数を指定する
-      paginator = Paginator(params["result"], 10)
-      try:
-        results = paginator.page(page)
-      except PageNotAnInteger:
-        results = paginator.page(1)
-      except EmptyPage:
-        results = paginator.page(paginator.num_pages)
-      params["result"] = results
+            params["result"].append(d)
+
+        else:
+          # 検索キーワードを受け取って検索する
+          # keyに対応するvalueがあるかどうかでformのPOST処理を分ける
+          form = SearchForm(request.POST)
+          params["word"] = request.GET["word"]
+          params["form"] = form
+          word = request.GET["word"] # 検索キーワード
+
+          # 指定された条件で検索する -------------------
+          sort = params["sort"]
+          if sort == "再生回数の多い順":
+            print("sort_viewCounter")
+            searchfunc(word, "viewCounter") # 検索する
+          elif sort == "マイリスト数・お気に入り数が多い順":
+            print("sort_mylistCounter")
+            searchfunc(word, "mylistCounter") # 検索する
+          elif sort == "投稿日時が新しい順":
+            print("sort_startTime")
+            searchfunc(word, "startTime") # 検索する
+          elif sort == "コメント数の多い順":
+            print("sort_commentCounter")
+            searchfunc(word, "commentCounter") # 検索する
+
+        # ページング処理 -----------
+        page = request.GET.get("page", 1) # 現在のページ数を取得する(なければ1)
+        # 1ページに表示するデータ数を指定する
+        paginator = Paginator(params["result"], 10)
+        try:
+          results = paginator.page(page)
+        except PageNotAnInteger:
+          results = paginator.page(1)
+        except EmptyPage:
+          results = paginator.page(paginator.num_pages)
+        params["result"] = results
 
   return render(request, "niconico_search.html", params)
 
