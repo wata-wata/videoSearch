@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils.translation import gettext_lazy as _
 
-# 動画のカテゴリ
+# マイリストのカテゴリ
 class VideoCategory(models.Model):
     name = models.CharField(max_length=100)
     # カテゴリを保存するユーザーの情報
@@ -31,7 +31,7 @@ class VideoCategory(models.Model):
     def __str__(self):
         return self.name
 
-# 保存する動画の情報
+# マイリストに保存する動画の情報
 class Video(models.Model):
     title = models.CharField(max_length=100)
     url = models.CharField(max_length=300)
@@ -62,6 +62,27 @@ class Video(models.Model):
     # クラスオブジェクトを文字列で返すメソッド
     def __str__(self):
         return self.title
+
+# 検索結果
+class SearchResult(models.Model):
+    title = models.CharField(max_length=100)
+    url = models.CharField(max_length=300)
+    thumbnail = models.CharField(max_length=300)
+    viewCount = models.CharField(max_length=100)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    class Meta:
+          constraints = [
+              # ユニーク制約
+              models.UniqueConstraint(
+                  fields=("title", "user"),
+                  name="searchresult_unique"
+              )
+          ]
+
+    # クラスオブジェクトを文字列で返すメソッド
+    def __str__(self):
+      return self.title
 
 # ログイン認証
 class SiteUserManager(UserManager):
