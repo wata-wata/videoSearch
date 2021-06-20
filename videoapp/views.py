@@ -37,9 +37,6 @@ def youtube_searchfunc(request):
     # load_dotenv('.env') # localのみ
 
     DEVELOPER_KEY = os.environ.get("youtube_key") # 本番環境
-    DEVELOPER_KEY = "AIzaSyCOwWr4PdibRXda37LqgeM_AabPwBgEcZY" # ローカル
-    print("youtube_key: ", end="")
-    print(DEVELOPER_KEY)
 
     youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
           developerKey=DEVELOPER_KEY)
@@ -60,8 +57,6 @@ def youtube_searchfunc(request):
 
     i = 0
     for search_result in search_response.get("items", []):
-        # if i < 2: # テスト
-        #   print(search_result)
         i += 1
         if search_result["id"]["kind"] == "youtube#video":
           videos.append("%s (%s)" % (search_result["snippet"]["title"],
@@ -122,25 +117,18 @@ def youtube_searchfunc(request):
           # エラー処理
           messages.error(request, "キーワードを入力してください")
         else:
-          print(request.POST["sort"])
-          print(request.GET["word"])
-          print(request.GET["page"])
           sort = request.POST["sort"]
           word = request.GET["word"]
           params["sort"] = sort # テキストを変更する
 
           # 指定された条件で検索する -------------------
           if sort == "関連性が高い順":
-            print("sort_relevance")
             searchfunc(word, "relevance") # 検索する
           elif sort == "投稿日時が新しい順":
-            print("sort_date")
             searchfunc(word, "date") # 検索する
           elif sort == "評価の高い順":
-            print("sort_rating")
             searchfunc(word, "rating") # 検索する
           elif sort == "再生回数の多い順":
-            print("viewCount")
             searchfunc(word, "viewCount") # 検索する
 
           # ページング処理 -----------
@@ -175,13 +163,9 @@ def youtube_searchfunc(request):
 
   elif request.method == "GET":
     params["form"] = SearchForm()
-    print("get-------")
 
     is_exist_word = request.GET.get("word", False)
     if is_exist_word != False: # 「検索」ボタンが押されたとき、ページ番号が異なるページから遷移したとき
-      print("検索")
-      print(is_exist_word)
-
       if request.GET["word"] == "": # 検索ワードが入っていないとき
         # エラー処理
         messages.error(request, "キーワードを入力してください")
@@ -203,13 +187,8 @@ def youtube_searchfunc(request):
             d["viewCount"] = result.viewCount
 
             params["result"].append(d)
-            # print("result:", end="")
-            # print(result)
-            # print(result.url)
 
         else:
-          print(params["sort"])
-          print(type(params["sort"]))
           # 検索キーワードを受け取って検索する
           form = SearchForm(request.POST)
           params["word"] = request.GET["word"]
@@ -218,9 +197,7 @@ def youtube_searchfunc(request):
 
           # 指定された条件で検索する -------------------
           sort = params["sort"]
-          print("params['sort':]")
-          print(params["sort"])
-          print(params["result"])
+
           if sort == "関連性が高い順":
             searchfunc(word, "relevance") # 検索する
           elif sort == "投稿日時が新しい順": # いらない?
@@ -309,16 +286,12 @@ def niconico_searchfunc(request):
 
           # 指定された条件で検索する -------------------
           if sort == "再生回数の多い順":
-            print("sort_viewCounter")
             searchfunc(word, "viewCounter") # 検索する
           elif sort == "マイリスト数・お気に入り数が多い順":
-            print("sort_mylistCounter")
             searchfunc(word, "mylistCounter") # 検索する
           elif sort == "投稿日時が新しい順":
-            print("sort_startTime")
             searchfunc(word, "startTime") # 検索する
           elif sort == "コメント数の多い順":
-            print("sort_commentCounter")
             searchfunc(word, "commentCounter") # 検索する
 
           # ページング処理 -----------
@@ -353,13 +326,9 @@ def niconico_searchfunc(request):
   
   elif request.method == "GET":
     params["form"] = SearchForm()
-    print("get-------")
 
     is_exist_word = request.GET.get("word", False)
     if is_exist_word != False: # 「検索」ボタンが押されたとき、ページ番号が異なるページから遷移したとき
-      print("検索")
-      print(is_exist_word)
-
       if request.GET["word"] == "": # 検索ワードが入っていないとき
         # エラー処理
         messages.error(request, "キーワードを入力してください")
@@ -391,16 +360,12 @@ def niconico_searchfunc(request):
           # 指定された条件で検索する -------------------
           sort = params["sort"]
           if sort == "再生回数の多い順":
-            print("sort_viewCounter")
             searchfunc(word, "viewCounter") # 検索する
           elif sort == "マイリスト数・お気に入り数が多い順":
-            print("sort_mylistCounter")
             searchfunc(word, "mylistCounter") # 検索する
           elif sort == "投稿日時が新しい順":
-            print("sort_startTime")
             searchfunc(word, "startTime") # 検索する
           elif sort == "コメント数の多い順":
-            print("sort_commentCounter")
             searchfunc(word, "commentCounter") # 検索する
 
         # ページング処理 -----------
@@ -428,10 +393,8 @@ def mylistfunc(request):
     # カテゴリを全て取得する(名前でソートする)
     categories = []
     for i in VideoCategory.objects.filter(user=request.user).order_by("name").distinct().values("name"):
-      print(i["name"])
-      print(type(i["name"]))
       categories.append(i["name"])
-    print(categories)
+
     context = {
       "mylist": Video.objects.filter(user=request.user).order_by("-id"),
       # カテゴリをVideoモデルから、user名指定→カテゴリ重複しないように取ってきたい
@@ -440,26 +403,7 @@ def mylistfunc(request):
     return render(request, "mylist.html", context)
 
   elif request.method == "POST":
-    # print(request.POST)
-
     category_list = request.POST.getlist("check_delete")
-    # print("削除するカテゴリ: ")
-    # print(category_list) # 選択しなかったら[]になる ----------
-
-    # # カテゴリが1つ以上選択されたとき
-    # if category_list != []:
-    #   for i in category_list:
-    #     print(i)
-    #     print(type(i))
-    #     # string → dict
-    #     # i = ast.literal_eval(i)
-    #     # print(i["name"])
-
-    #     # VideoCategoryモデルから削除する
-    #     v = VideoCategory.objects.filter(user=request.user).filter(name=i)
-    #     print(v)
-    #     v.delete()
-    #     messages.success(request, "カテゴリ「" + i + "」を削除しました")
 
     if request.POST.get("category_add", False) != False:
       # カテゴリを追加する
@@ -471,7 +415,6 @@ def mylistfunc(request):
       })
 
       if category_add == "": # カテゴリが入力されていないとき
-        print("カテゴリを入力してください")
         messages.error(request, "カテゴリを入力してください")
 
       elif form.is_valid() == True:
@@ -488,15 +431,8 @@ def mylistfunc(request):
     # カテゴリが1つ以上選択されたとき
     elif category_list != []:
       for i in category_list:
-        print(i)
-        print(type(i))
-        # string → dict
-        # i = ast.literal_eval(i)
-        # print(i["name"])
-
         # VideoCategoryモデルから削除する
         v = VideoCategory.objects.filter(user=request.user).filter(name=i)
-        print(v)
         v.delete()
         messages.success(request, "カテゴリ「" + i + "」を削除しました")
 
@@ -510,10 +446,8 @@ def mylistfunc(request):
     # カテゴリを全て取得する
     categories = []
     for i in VideoCategory.objects.filter(user=request.user).order_by("name").distinct().values("name"):
-      print(i["name"])
-      print(type(i["name"]))
       categories.append(i["name"])
-    print(categories)
+
     context = {
       "mylist": Video.objects.filter(user=request.user).order_by("-id"),
       # カテゴリをVideoモデルから、user名指定→カテゴリ重複しないように取ってきたい
@@ -526,25 +460,18 @@ def mylistfunc(request):
 @login_required
 def mylist_categoryfunc(request, pk):
   # pk: 選択したカテゴリの名前
-  print(pk)
-  print(type(pk))
 
   if request.method == "POST": # 削除する動画を選択したとき
     # 選択した動画を削除する
     category_name = request.POST.get("category_name")
-    print(category_name)
-    print(type(category_name))
 
     video_list = request.POST.getlist("check_delete")
-    print(video_list) # 選択しなかったら[]になる
 
     # 動画が1つ以上選択されたとき
     if video_list != []:
       for i in video_list:
-        print(i)
         # string → dict
         i = ast.literal_eval(i)
-        print(i["title"])
 
         # Videoモデルから削除する
         v = Video.objects.filter(user=request.user).filter(category__name=category_name).filter(title=i["title"])
@@ -559,8 +486,6 @@ def mylist_categoryfunc(request, pk):
   # category__name: VideoCategoryモデルのname
   video = Video.objects.filter(user=request.user).filter(category__name=pk)
 
-  print(video)
-
   # titles = []
   video_info = []
   for i in video:
@@ -572,7 +497,6 @@ def mylist_categoryfunc(request, pk):
     
     v = Video.objects.filter(user=request.user).filter(category__name=pk).filter(title=title)
     # URL
-    print(v[0].url)
     d["url"] = v[0].url
 
     if "youtube" in d["url"]:
@@ -581,7 +505,6 @@ def mylist_categoryfunc(request, pk):
       d["type"] = "ニコニコ動画"
 
     # サムネイル
-    print(v[0].thumbnail)
     d["thumbnail"] = v[0].thumbnail
 
     video_info.append(d)
@@ -611,7 +534,6 @@ def addMylistFunc(request):
       })
 
       if category_add == "": # カテゴリが入力されていないとき
-        print("カテゴリを入力してください")
         messages.error(request, "カテゴリを入力してください")
 
       elif form.is_valid() == True:
@@ -632,7 +554,6 @@ def addMylistFunc(request):
 
     elif "video_add_button" in request.POST:
       # 選択した動画をマイリストに追加 ---------------
-      print("選択した動画をマイリストに追加")
       d["title"] = request.POST["title"]
       d["url"] = request.POST["url"]
       d["thumbnail"] = request.POST["thumbnail"]
@@ -644,17 +565,12 @@ def addMylistFunc(request):
         if(request.POST[key]=="on"):
           category_checked = True
 
-          print(request.POST["url"])
-          print(VideoCategory.objects.filter(name=key)[0].name)
-
           # 重複しているデータがあるか判定する
           form = VideoReservationForm({
             "url":request.POST["url"],
             "user":request.user,
             "category":VideoCategory.objects.filter(name=key)[0]
           })
-
-          print(form.is_valid()) # Trueならモデルに追加する
 
           if form.is_valid() == True:
             # モデル「Video」に追加する ---------------
