@@ -53,7 +53,8 @@ def youtube_searchfunc(request):
     playlists = []
 
     # データベースに保存されている検索結果を削除する -----------
-    SearchResult.objects.filter(user=request.user).delete()
+    # SearchResult.objects.filter(user=request.user).delete()
+    SearchResult.objects.all().delete()
 
     i = 0
     for search_result in search_response.get("items", []):
@@ -85,8 +86,8 @@ def youtube_searchfunc(request):
             title=search_result["snippet"]["title"],
             url="https://www.youtube.com/watch?v=" + search_result["id"]["videoId"],
             thumbnail=search_result["snippet"]["thumbnails"]["default"]["url"],
-            viewCount=viewCount["viewCount"],
-            user=request.user
+            viewCount=viewCount["viewCount"]
+            # user=request.user
           )
           r.save() # SearchResultモデルに追加する
 
@@ -176,7 +177,8 @@ def youtube_searchfunc(request):
         if request.GET.get("sort", False) != False: # ページ遷移の場合
           params["sort"] = request.GET["sort"]
           # モデルからデータを取得する
-          results = SearchResult.objects.filter(user=request.user)
+          # results = SearchResult.objects.filter(user=request.user)
+          results = SearchResult.objects.all()
           
           for result in results:
             d = {}
@@ -238,7 +240,8 @@ def niconico_searchfunc(request):
     }
 
     # データベースに保存されている検索結果を削除する -----------
-    SearchResult.objects.filter(user=request.user).delete()
+    # SearchResult.objects.filter(user=request.user).delete()
+    SearchResult.objects.all().delete()
 
     # データを取得する
     responses = requests.get(REQUEST_URL, query).json()
@@ -256,8 +259,8 @@ def niconico_searchfunc(request):
         title=responses["data"][i]["title"],
         url="https://nico.ms/" + responses["data"][i]["contentId"],
         thumbnail=responses["data"][i]["thumbnailUrl"],
-        viewCount=responses["data"][i]["viewCounter"],
-        user=request.user
+        viewCount=responses["data"][i]["viewCounter"]
+        # user=request.user
       )
       r.save() # SearchResultモデルに追加する
 
@@ -337,7 +340,8 @@ def niconico_searchfunc(request):
         if request.GET.get("sort", False) != False: # ページ遷移の場合
           params["sort"] = request.GET["sort"]
           # モデルからデータを取得する
-          results = SearchResult.objects.filter(user=request.user)
+          # results = SearchResult.objects.filter(user=request.user)
+          results = SearchResult.objects.all()
 
           for result in results:
             d = {}

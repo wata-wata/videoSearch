@@ -69,16 +69,16 @@ class SearchResult(models.Model):
     url = models.CharField(max_length=300)
     thumbnail = models.CharField(max_length=300)
     viewCount = models.CharField(max_length=100)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    # user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
-    class Meta:
-          constraints = [
-              # ユニーク制約
-              models.UniqueConstraint(
-                  fields=("title", "user"),
-                  name="searchresult_unique"
-              )
-          ]
+    # class Meta:
+    #       constraints = [
+    #           # ユニーク制約
+    #           models.UniqueConstraint(
+    #               fields=("title", "user"),
+    #               name="searchresult_unique"
+    #           )
+    #       ]
 
     # クラスオブジェクトを文字列で返すメソッド
     def __str__(self):
