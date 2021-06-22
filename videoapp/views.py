@@ -1,4 +1,3 @@
-# from videoapp.constant import DEVELOPER_KEY
 from videoapp.models import *
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, QueryDict
@@ -20,11 +19,9 @@ from dotenv import load_dotenv
 from apiclient.discovery import build
 from apiclient.errors import HttpError
 from oauth2client.tools import argparser
-# DEVELOPER_KEY = DEVELOPER_KEY
+
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
-
-# DEVELOPER_KEY = os.environ['youtube_key']
 
 # トップページ
 def topfunc(request):
@@ -44,7 +41,7 @@ def youtube_searchfunc(request):
     search_response = youtube.search().list(
         q=word, # 検索キーワード
         part="id,snippet",
-        maxResults=6, # 取得する動画の数
+        maxResults=50, # 取得する動画の数
         order=sort # order: 並び替える基準
       ).execute()
 
@@ -53,7 +50,6 @@ def youtube_searchfunc(request):
     playlists = []
 
     # データベースに保存されている検索結果を削除する -----------
-    # SearchResult.objects.filter(user=request.user).delete()
     SearchResult.objects.all().delete()
 
     i = 0
@@ -66,10 +62,8 @@ def youtube_searchfunc(request):
           d = {}
           # 動画のタイトル
           d["title"] = search_result["snippet"]["title"]
-          # params['result'].append(search_result["snippet"]["title"])
           # 動画のURL
           d["url"] = "https://www.youtube.com/watch?v=" + search_result["id"]["videoId"]
-          # params['result'].append("https://www.youtube.com/watch?v=" + search_result["id"]["videoId"])
           # サムネイルの画像のURL
           d["thumbnail"] = search_result["snippet"]["thumbnails"]["default"]["url"]
           # チャンネル名
@@ -87,7 +81,6 @@ def youtube_searchfunc(request):
             url="https://www.youtube.com/watch?v=" + search_result["id"]["videoId"],
             thumbnail=search_result["snippet"]["thumbnails"]["default"]["url"],
             viewCount=viewCount["viewCount"]
-            # user=request.user
           )
           r.save() # SearchResultモデルに追加する
 
@@ -133,11 +126,10 @@ def youtube_searchfunc(request):
             searchfunc(word, "viewCount") # 検索する
 
           # ページング処理 -----------
-          # page = request.GET.get("page", 1) # 現在のページ数を取得する(なければ1)
           page = 1 # 1ページ目を表示するようにする --------
 
           # 1ページに表示するデータ数を指定する
-          paginator = Paginator(params["result"], 3)
+          paginator = Paginator(params["result"], 10)
           try:
             results = paginator.page(page)
           except PageNotAnInteger:
@@ -155,7 +147,6 @@ def youtube_searchfunc(request):
       d["title"] = request.POST["title"]
       d["url"] = request.POST["url"]
       d["thumbnail"] = request.POST["thumbnail"]
-      # d['categories'] = VideoCategory.objects.all # カテゴリ一覧
       d["categories"] = VideoCategory.objects.filter(user=request.user).order_by("name").distinct()
 
       return render(request, "mylist_add.html", d)
@@ -177,12 +168,10 @@ def youtube_searchfunc(request):
         if request.GET.get("sort", False) != False: # ページ遷移の場合
           params["sort"] = request.GET["sort"]
           # モデルからデータを取得する
-          # results = SearchResult.objects.filter(user=request.user)
           results = SearchResult.objects.all()
           
           for result in results:
             d = {}
-            # title, url, thumbnail, viewCount
             d["title"] = result.title
             d["url"] = result.url
             d["thumbnail"] = result.thumbnail
@@ -212,7 +201,7 @@ def youtube_searchfunc(request):
         # ページング処理 -----------
         page = request.GET.get("page", 1) # 現在のページ数を取得する(なければ1)
         # 1ページに表示するデータ数を指定する
-        paginator = Paginator(params["result"], 3)
+        paginator = Paginator(params["result"], 10)
         try:
           results = paginator.page(page)
         except PageNotAnInteger:
@@ -236,11 +225,9 @@ def niconico_searchfunc(request):
         "_sort":sort,
         "_context":"nico_jsonFilter",
         "_limit":50, # 取得する動画の数
-        # "jsonFilter":jsonFilter # 条件を絞る
     }
 
     # データベースに保存されている検索結果を削除する -----------
-    # SearchResult.objects.filter(user=request.user).delete()
     SearchResult.objects.all().delete()
 
     # データを取得する
@@ -260,7 +247,6 @@ def niconico_searchfunc(request):
         url="https://nico.ms/" + responses["data"][i]["contentId"],
         thumbnail=responses["data"][i]["thumbnailUrl"],
         viewCount=responses["data"][i]["viewCounter"]
-        # user=request.user
       )
       r.save() # SearchResultモデルに追加する
 
@@ -298,7 +284,6 @@ def niconico_searchfunc(request):
             searchfunc(word, "commentCounter") # 検索する
 
           # ページング処理 -----------
-          # page = request.GET.get("page", 1) # 現在のページ数を取得する(なければ1)
           page = 1 # 1ページ目を表示するようにする --------
 
           # 1ページに表示するデータ数を指定する
@@ -320,7 +305,6 @@ def niconico_searchfunc(request):
       d["title"] = request.POST["title"]
       d["url"] = request.POST["url"]
       d["thumbnail"] = request.POST["thumbnail"]
-      # d["categories"] = VideoCategory.objects.all # カテゴリ一覧
       d["categories"] = VideoCategory.objects.filter(user=request.user).order_by("name").distinct()
 
       return render(request, "mylist_add.html", d)
@@ -340,12 +324,10 @@ def niconico_searchfunc(request):
         if request.GET.get("sort", False) != False: # ページ遷移の場合
           params["sort"] = request.GET["sort"]
           # モデルからデータを取得する
-          # results = SearchResult.objects.filter(user=request.user)
           results = SearchResult.objects.all()
 
           for result in results:
             d = {}
-            # title, url, thumbnail, viewCount
             d["title"] = result.title
             d["url"] = result.url
             d["thumbnail"] = result.thumbnail
@@ -355,7 +337,6 @@ def niconico_searchfunc(request):
 
         else:
           # 検索キーワードを受け取って検索する
-          # keyに対応するvalueがあるかどうかでformのPOST処理を分ける
           form = SearchForm(request.POST)
           params["word"] = request.GET["word"]
           params["form"] = form
@@ -401,7 +382,6 @@ def mylistfunc(request):
 
     context = {
       "mylist": Video.objects.filter(user=request.user).order_by("-id"),
-      # カテゴリをVideoモデルから、user名指定→カテゴリ重複しないように取ってきたい
       "categories": categories
     }
     return render(request, "mylist.html", context)
@@ -443,9 +423,6 @@ def mylistfunc(request):
     else:
       # 削除するカテゴリが選択されなかったとき
       messages.error(request,"削除するカテゴリを選択してください")
-    # else:
-    #   # カテゴリが入力されなかったとき
-    #   messages.error(request,"追加するカテゴリを入力してください")
 
     # カテゴリを全て取得する
     categories = []
@@ -454,7 +431,6 @@ def mylistfunc(request):
 
     context = {
       "mylist": Video.objects.filter(user=request.user).order_by("-id"),
-      # カテゴリをVideoモデルから、user名指定→カテゴリ重複しないように取ってきたい
       "categories": categories
     }
 
@@ -464,7 +440,6 @@ def mylistfunc(request):
 @login_required
 def mylist_categoryfunc(request, pk):
   # pk: 選択したカテゴリの名前
-
   if request.method == "POST": # 削除する動画を選択したとき
     # 選択した動画を削除する
     category_name = request.POST.get("category_name")
@@ -490,13 +465,11 @@ def mylist_categoryfunc(request, pk):
   # category__name: VideoCategoryモデルのname
   video = Video.objects.filter(user=request.user).filter(category__name=pk)
 
-  # titles = []
   video_info = []
   for i in video:
     d = {}
     # タイトル
     title = str(i)
-    # titles.append(title)
     d["title"] = title
     
     v = Video.objects.filter(user=request.user).filter(category__name=pk).filter(title=title)

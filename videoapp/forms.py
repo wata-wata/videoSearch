@@ -9,12 +9,10 @@ class SearchForm(forms.Form):
     widget=forms.TextInput(attrs={"name":"search","placeholder":"キーワードを入力","class":"search_inputtext"}))
 
 # マイリストへの動画の追加に使う
-# VideoReservationForm使っててこっちは使ってない...?
 class MyVideo(forms.ModelForm):
     class Meta:
         model = Video
         # 使用するフィールド
-        # fields = ("title", "url", "thumbnail")
         fields = ("url", "category")
 
     def __init__(self, user, *args, **kwargs):
